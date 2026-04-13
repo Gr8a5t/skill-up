@@ -18,7 +18,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 
 // Protected Routes
 Route::middleware('auth')->group(function () {
-
+    Route::get('/user-dashboard', [FitlifeController::class, 'dashboard'])->name('dashboard');
     // News Community Routes
     Route::prefix('news')->name('news.')->group(function () {
         Route::get('/', [NewsController::class, 'index'])->name('index');

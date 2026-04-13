@@ -773,4 +773,58 @@ class FitlifeController extends Controller
 
         return $minutes.' min';
     }
+
+    public function dashboard()
+    {
+        // Provide dummy lists to match the mockup
+        $continueWatching = [
+            [
+                'title' => 'Beginner\'s Guide to Becoming a Professional Front-End Developer',
+                'category' => 'FRONT END',
+                'mentor' => 'Leonardo samsul',
+                'image' => asset('fitlife-assets/images/blog-1.jpg')
+            ],
+            [
+                'title' => 'Optimizing User Experience with the Best UI/UX Design',
+                'category' => 'UI/UX DESIGN',
+                'mentor' => 'Bayu Salto',
+                'image' => asset('fitlife-assets/images/blog-2.jpg')
+            ],
+            [
+                'title' => 'Reviving and Refresh Company Image',
+                'category' => 'BRANDING',
+                'mentor' => 'Padhang Satrio',
+                'image' => asset('fitlife-assets/images/blog-3.jpg')
+            ],
+        ];
+
+        $lessons = [
+            [
+                'mentor' => 'Padhang Satrio',
+                'date' => '2/16/2004',
+                'type' => 'UI/UX DESIGN',
+                'desc' => 'Understand Of UI/UX Design'
+            ],
+            [
+                'mentor' => 'Leonardo samsul',
+                'date' => '3/10/2004',
+                'type' => 'FRONT END',
+                'desc' => 'Structure with HTML5'
+            ],
+            [
+                'mentor' => 'Bayu Salto',
+                'date' => '4/05/2004',
+                'type' => 'BRANDING',
+                'desc' => 'Brand Identity Assets'
+            ],
+        ];
+
+        $mentors = [
+            ['name' => 'Padhang Satrio', 'role' => 'Mentor', 'avatar' => 'PS'],
+            ['name' => 'Zakir Horizontal', 'role' => 'Mentor', 'avatar' => 'ZH'],
+            ['name' => 'Leonardo samsul', 'role' => 'Mentor', 'avatar' => 'LS'],
+        ];
+
+        return view('fitlife.user-dashboard', compact('continueWatching', 'lessons', 'mentors'));
+    }
 }
