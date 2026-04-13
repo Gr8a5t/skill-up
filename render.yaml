@@ -1,0 +1,37 @@
+services:
+  - type: web
+    name: skillup-web
+    env: docker
+    plan: free # or your preferred plan
+    region: ohio # Change to your preferred region
+    dockerContext: .
+    dockerfilePath: Dockerfile
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_URL
+        fromService:
+          name: skillup-web
+          type: web
+          property: host
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_URL
+        fromDatabase:
+          name: skillup-db
+          property: connectionString
+      - key: APP_KEY
+        generateValue: true # Generate a random string, but Laravel might need a base64 encoded one
+      - key: SESSION_DRIVER
+        value: database
+      - key: CACHE_STORE
+        value: database
+      - key: LOG_CHANNEL
+        value: errorlog
+
+databases:
+  - name: skillup-db
+    plan: free # or your preferred plan
+    region: ohio
