@@ -99,7 +99,7 @@ RUN composer dump-autoload --optimize --no-dev
 
 # Set permissions for Nginx and PHP
 RUN mkdir -p /var/lib/nginx/tmp /var/log/nginx \
-    && chown -R www-data:www-data /var/lib/nginx /var/log/nginx /var/www/html/storage /var/www/html/bootstrap/cache
+    && chown -R www-data:www-data /var/lib/nginx /var/log/nginx /var/www/html
 
 # Copy Nginx config
 COPY nginx.conf /etc/nginx/nginx.conf

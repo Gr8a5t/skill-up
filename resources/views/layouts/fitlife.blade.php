@@ -7,8 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'SkillUp — Build practical skills for free')</title>
 
-    <link rel="shortcut icon" href="{{ asset('favicon4.png') }}" type="image/png">
-    <link rel="icon" href="{{ asset('favicon4.png') }}" type="image/png">
+    <link rel="shortcut icon" href="{{ asset('favicon4.png?v=2') }}" type="image/png">
+    <link rel="icon" href="{{ asset('favicon4.png?v=2') }}" type="image/png">
 
     <link rel="stylesheet" href="{{ asset('fitlife-assets/css/style.css') }}">
 
