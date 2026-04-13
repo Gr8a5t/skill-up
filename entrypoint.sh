@@ -8,8 +8,16 @@ if [ -z "$APP_KEY" ]; then
     echo "WARNING: APP_KEY is not set. You should set this in the Render dashboard."
 fi
 
-# Run migrations (only if DB is ready)
-# We use --force because it's production
+# Clear config cache just in case
+echo "Clearing config..."
+php artisan config:clear
+
+# Debug Environment (Safe check)
+echo "Checking Environment..."
+echo "APP_ENV: $APP_ENV"
+echo "DB_CONNECTION: $DB_CONNECTION"
+if [ -n "$DB_URL" ]; then echo "DB_URL is set"; else echo "DB_URL is NOT set"; fi
+
 echo "Checking database connection..."
 php artisan db:monitor || echo "Database connection failed, but proceeding anyway..."
 
