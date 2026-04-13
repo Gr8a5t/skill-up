@@ -12,7 +12,10 @@ RUN apk add --no-cache \
     libjpeg-turbo-dev \
     freetype-dev \
     postgresql-dev \
-    icu-dev
+    icu-dev \
+    libxml2-dev \
+    oniguruma-dev \
+    curl-dev
 
 # Install PHP extensions
 RUN docker-php-ext-install \
@@ -20,7 +23,11 @@ RUN docker-php-ext-install \
     zip \
     gd \
     intl \
-    bcmath
+    bcmath \
+    xml \
+    dom \
+    mbstring \
+    curl
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -57,7 +64,10 @@ RUN apk add --no-cache \
     postgresql-dev \
     libzip-dev \
     icu-dev \
-    libpng-dev
+    libpng-dev \
+    libxml2-dev \
+    oniguruma-dev \
+    curl-dev
 
 # Install PHP extensions
 RUN docker-php-ext-install \
@@ -65,7 +75,11 @@ RUN docker-php-ext-install \
     zip \
     intl \
     bcmath \
-    opcache
+    opcache \
+    xml \
+    dom \
+    mbstring \
+    curl
 
 # Copy application files
 COPY . .
@@ -80,8 +94,9 @@ COPY --from=frontend /app/public/build ./public/build
 COPY --from=composer /usr/bin/composer /usr/bin/composer
 RUN composer dump-autoload --optimize --no-dev
 
-# Set permissions
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+# Set permissions for Nginx and PHP
+RUN mkdir -p /var/lib/nginx/tmp /var/log/nginx \
+    && chown -R www-data:www-data /var/lib/nginx /var/log/nginx /var/www/html/storage /var/www/html/bootstrap/cache
 
 # Copy Nginx config
 COPY nginx.conf /etc/nginx/nginx.conf

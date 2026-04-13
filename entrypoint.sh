@@ -10,8 +10,14 @@ fi
 
 # Run migrations (only if DB is ready)
 # We use --force because it's production
+echo "Checking database connection..."
+php artisan db:monitor || echo "Database connection failed, but proceeding anyway..."
+
 echo "Running migrations..."
 php artisan migrate --force --no-interaction
+
+echo "Creating storage link..."
+php artisan storage:link --force || echo "Storage link already exists."
 
 # Start NGINX in the foreground
 echo "Starting NGINX..."
