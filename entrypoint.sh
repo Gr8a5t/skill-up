@@ -18,6 +18,18 @@ echo "APP_ENV: $APP_ENV"
 echo "DB_CONNECTION: $DB_CONNECTION"
 if [ -n "$DB_URL" ]; then echo "DB_URL is set"; else echo "DB_URL is NOT set"; fi
 
+# APP_KEY Validation
+if [ -n "$APP_KEY" ]; then
+    echo "APP_KEY check:"
+    echo "  - Raw Length: ${#APP_KEY}"
+    case "$APP_KEY" in
+        "base64:"*) echo "  - Starts with base64: Yes" ;;
+        *) echo "  - Starts with base64: NO" ;;
+    esac
+else
+    echo "APP_KEY is NOT set!"
+fi
+
 echo "Checking database connection..."
 php artisan db:monitor || echo "Database connection failed, but proceeding anyway..."
 
