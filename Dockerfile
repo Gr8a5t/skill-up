@@ -84,6 +84,9 @@ RUN docker-php-ext-install \
 # Copy application files
 COPY . .
 
+# Remove any existing .env to ensure Render env vars are used
+RUN rm -f .env
+
 # Copy composer dependencies from Stage 1
 COPY --from=composer /app/vendor ./vendor
 
@@ -100,6 +103,9 @@ RUN mkdir -p /var/lib/nginx/tmp /var/log/nginx \
 
 # Copy Nginx config
 COPY nginx.conf /etc/nginx/nginx.conf
+
+# Copy PHP-FPM config
+COPY fpm-www.conf /usr/local/etc/php-fpm.d/www.conf
 
 # Copy entrypoint
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
