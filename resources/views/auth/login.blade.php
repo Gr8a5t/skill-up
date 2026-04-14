@@ -117,6 +117,27 @@
     border-left: 4px solid #d93d3d;
 }
 
+.auth-remember {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.auth-remember input {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #ff4500;
+}
+
+.auth-remember span {
+    font-size: 1.4rem;
+    color: #3c3c3c;
+}
+
 </style>
 
 <div class="auth-wrapper">
@@ -147,6 +168,11 @@
                 <label for="password">Password</label>
                 <input type="password" id="password" name="password" class="auth-input" required>
             </div>
+
+            <label class="auth-remember" for="remember">
+                <input type="checkbox" name="remember" id="remember">
+                <span>Remember me</span>
+            </label>
 
             <button type="submit" class="auth-btn">Sign In</button>
         </form>

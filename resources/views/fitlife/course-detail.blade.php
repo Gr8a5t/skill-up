@@ -24,9 +24,9 @@
                         </div>
                         <div class="header-right">
                             <a href="#" class="btn-share">Share</a>
-                            <button class="btn btn-primary btn-enroll">
+                            <a href="{{ $course['coursera_link'] }}" target="_blank" class="btn btn-primary btn-enroll">
                                 <ion-icon name="lock-closed-outline"></ion-icon> Enroll Now
-                            </button>
+                            </a>
                         </div>
                     </div>
 
@@ -39,12 +39,12 @@
                     <div class="course-unified-grid">
                         <div class="course-unified-left">
                             
-                            <div class="course-video-wrapper" style="background-color: {{ $course['banner_color'] ?? '#e8e2d4' }};">
+                            <a href="{{ $course['coursera_link'] }}" target="_blank" class="course-video-wrapper" style="background-color: {{ $course['banner_color'] ?? '#e8e2d4' }};">
                                 <img src="{{ $course['image'] }}" alt="{{ $course['title'] }}" loading="lazy">
                                 <div class="play-button-overlay">
                                     <ion-icon name="play"></ion-icon>
                                 </div>
-                            </div>
+                            </a>
 
                             <ul class="course-tabs">
                                 <li><button class="tab-btn active">Overview</button></li>
