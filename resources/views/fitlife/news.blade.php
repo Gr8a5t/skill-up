@@ -268,9 +268,6 @@
         <div class="news-layout">
             {{-- Feed --}}
             <div class="news-feed">
-                @if(session('success'))
-                    <div class="n-alert n-alert-success">{{ session('success') }}</div>
-                @endif
 
                 @forelse($posts as $post)
                 <div class="news-card" onclick="window.location='{{ route('news.show', $post->id) }}'">
@@ -410,8 +407,6 @@ document.querySelectorAll('.vbtn').forEach(btn => {
                 }
             }
         });
-    });
-});
 </script>
 
 @endsection

@@ -244,10 +244,6 @@
 
             {{-- Main Column --}}
             <div>
-                @if(session('success'))
-                    <div class="n-alert n-alert-success">{{ session('success') }}</div>
-                @endif
-
                 {{-- Post --}}
                 <div class="ns-post-card">
                     <div class="vote-rail">
@@ -417,6 +413,7 @@ function toggleReplies(commentId) {
         if (icon) icon.setAttribute('name', 'chevron-down-outline');
     }
 }
+
 </script>
 
 {{-- Comment Modal --}}
