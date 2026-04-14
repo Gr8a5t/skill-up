@@ -59,11 +59,11 @@ class NewsController extends Controller
         ]);
 
         NewsPost::create([
-            'title' => $request->title,
-            'content' => $request->content,
-            'community_id' => $request->community_id,
+            'title' => $request->input('title'),
+            'content' => $request->input('content'),
+            'community_id' => $request->input('community_id'),
             'session_id' => $this->getSessionId($request),
-            'username' => auth()->user()->name
+            'username' => auth()->check() ? auth()->user()->name : 'Anonymous Learner'
         ]);
 
         return redirect()->route('news.index')->with('success', 'Post created successfully!');
@@ -77,10 +77,10 @@ class NewsController extends Controller
         ]);
 
         $post->comments()->create([
-            'content' => $request->content,
+            'content' => $request->input('content'),
             'session_id' => $this->getSessionId($request),
-            'username' => auth()->user()->name,
-            'parent_id' => $request->parent_id
+            'username' => auth()->check() ? auth()->user()->name : 'Anonymous Learner',
+            'parent_id' => $request->input('parent_id')
         ]);
 
         $post->increment('comments_count');
