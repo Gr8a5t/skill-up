@@ -369,15 +369,6 @@
             <form action="{{ route('news.store') }}" method="POST">
                 @csrf
                 <div class="n-form-group">
-                    <label class="n-form-label">Community</label>
-                    <select name="community_id" required class="n-form-ctrl">
-                        <option value="">Choose a community...</option>
-                        @foreach($communities as $community)
-                            <option value="{{ $community->id }}">s/{{ $community->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="n-form-group">
                     <label class="n-form-label">Title</label>
                     <input type="text" name="title" placeholder="An interesting title..." required class="n-form-ctrl">
                 </div>

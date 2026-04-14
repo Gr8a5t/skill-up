@@ -401,7 +401,7 @@ function openCommentModal(parentId = null, username = null) {
     if (parentId && username) {
         targetText.innerHTML = `Replying to <strong style="color:#ff4500;">u/${username}</strong>`;
     } else {
-        targetText.innerHTML = `Commenting as <strong style="color:#ff4500;">{{ auth()->user()->name }}</strong>`;
+        targetText.innerHTML = `Commenting as <strong style="color:#ff4500;">{{ auth()->user()->name ?? 'Anonymous Learner' }}</strong>`;
     }
     document.getElementById('commentModal').classList.remove('hidden');
 }
@@ -429,7 +429,7 @@ function toggleReplies(commentId) {
             </button>
         </div>
         <div class="n-modal-body">
-            <p id="commentTarget" style="font-size:1.4rem; color:#878a8c; margin-bottom:14px;">Commenting as <strong style="color:#ff4500;">{{ auth()->user()->name }}</strong></p>
+            <p id="commentTarget" style="font-size:1.4rem; color:#878a8c; margin-bottom:14px;">Commenting as <strong style="color:#ff4500;">{{ auth()->user()->name ?? 'Anonymous Learner' }}</strong></p>
             <form action="{{ route('news.comment', $post->id) }}" method="POST">
                 @csrf
                 <input type="hidden" name="parent_id" id="modalParentId" value="">

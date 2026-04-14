@@ -55,7 +55,7 @@ class NewsController extends Controller
         $request->validate([
             'title' => 'required|max:255',
             'content' => 'required',
-            'community_id' => 'required|exists:communities,id'
+            'community_id' => 'nullable|exists:communities,id'
         ]);
 
         NewsPost::create([
