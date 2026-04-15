@@ -152,22 +152,41 @@
             .right-panel > div { flex: 1; }
         }
         @media (max-width: 992px) {
-            .sidebar { position: fixed; left: -260px; height: 100vh; z-index: 100; transition: 0.3s; }
+            .sidebar { position: fixed; left: -260px; height: 100vh; z-index: 1000; transition: 0.3s; box-shadow: 10px 0 30px rgba(0,0,0,0.1); }
+            .sidebar.open { left: 0; }
+            .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 999; }
+            .sidebar-overlay.active { display: block; }
+            
+            .topbar { padding: 0 20px; }
+            .hamburger-btn { display: flex !important; align-items: center; justify-content: center; width: 40px; height: 40px; border: 1px solid var(--border-color); border-radius: 5px; background: #fff; cursor: pointer; font-size: 2.2rem; }
+            
             .hero-title { font-size: 2.2rem; }
             .cw-grid, .metric-row { grid-template-columns: repeat(2, 1fr); }
-            .right-panel { flex-direction: column; }
+            .right-panel { flex-direction: column; width: 100%; }
+            .content-area { padding: 20px; }
         }
         @media (max-width: 768px) {
             .cw-grid, .metric-row { grid-template-columns: 1fr; }
-            .search-bar { width: auto; flex-grow: 1; margin-right: 20px; }
+            .search-bar { display: none; }
+            .hero-banner { padding: 30px 24px; }
+            .hero-title { font-size: 1.8rem; }
+            
+            /* Responsive Table Magic */
+            .lesson-table thead { display: none; }
+            .lesson-table, .lesson-table tbody, .lesson-table tr, .lesson-table td { display: block; width: 100%; }
+            .lesson-table tr { margin-bottom: 16px; border-bottom: 1px solid var(--border-color); }
+            .lesson-table td { border-bottom: none; display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; text-align: right; }
+            .lesson-table td::before { content: attr(data-label); font-weight: 700; color: var(--text-mut); text-transform: uppercase; font-size: 1rem; float: left; }
+            .lesson-table td:last-child { padding-bottom: 20px; }
         }
     </style>
 </head>
 <body>
 
 <div class="layout-wrapper">
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
     <!-- Sidebar -->
-    <aside class="sidebar">
+    <aside class="sidebar" id="dashboardSidebar">
         <a href="/" class="sidebar-logo">
             <img src="{{ asset('fitlife-assets/images/uplogo.png') }}" alt="SkillUp Logo" style="width: 140px; height: auto;">
         </a>
@@ -221,6 +240,9 @@
     <main class="main-col">
         <!-- Topbar -->
         <header class="topbar">
+            <button class="hamburger-btn" id="sidebarToggle" style="display: none;">
+                <ion-icon name="menu-outline"></ion-icon>
+            </button>
             <div class="search-bar">
                 <ion-icon name="search-outline"></ion-icon>
                 <input type="text" class="search-input" placeholder="Search your course....">
@@ -320,7 +342,7 @@
                     <tbody>
                         @foreach($lessons as $lesson)
                         <tr>
-                            <td>
+                            <td data-label="Mentor">
                                 <div class="tbl-mentor">
                                     <div class="cw-mentor-ava" style="width:36px; height:36px; font-size:1.2rem;">{{ strtoupper(substr($lesson['mentor'], 0, 1)) }}</div>
                                     <div class="tbl-m-info">
@@ -329,11 +351,11 @@
                                     </div>
                                 </div>
                             </td>
-                            <td>
+                            <td data-label="Type">
                                 <span class="tbl-badge"><ion-icon name="color-filter-outline"></ion-icon> {{ \Str::title(strtolower($lesson['type'])) }}</span>
                             </td>
-                            <td style="font-weight: 500; color: var(--text-main);">{{ $lesson['desc'] }}</td>
-                            <td>
+                            <td data-label="Description" style="font-weight: 500; color: var(--text-main);">{{ $lesson['desc'] }}</td>
+                            <td data-label="Action">
                                 <a href="#" class="action-arrow"><ion-icon name="arrow-forward-outline"></ion-icon></a>
                             </td>
                         </tr>
@@ -404,5 +426,23 @@
 
 <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
 <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+
+<script>
+    const sidebar = document.getElementById('dashboardSidebar');
+    const toggle = document.getElementById('sidebarToggle');
+    const overlay = document.getElementById('sidebarOverlay');
+
+    if (toggle && sidebar && overlay) {
+        toggle.addEventListener('click', () => {
+            sidebar.classList.add('open');
+            overlay.classList.add('active');
+        });
+
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('active');
+        });
+    }
+</script>
 </body>
 </html>
