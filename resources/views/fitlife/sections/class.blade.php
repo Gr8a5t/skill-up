@@ -13,7 +13,7 @@
 
                         <figure class="card-banner img-holder" style="--width: 416; --height: 240;">
                             <img src="{{ asset('fitlife-assets/images/' . ($class['image'] ?? 'class-1.jpg')) }}" width="416"
-                                height="240" loading="lazy" alt="{{ $class['title'] }}" class="img-cover">
+                                height="240" loading="lazy" decoding="async" alt="{{ $class['title'] }}" class="img-cover">
                         </figure>
 
                         <div class="card-content">

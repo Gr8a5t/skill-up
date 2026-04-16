@@ -2,15 +2,15 @@
     <div class="container">
 
         <div class="about-banner has-after">
-            <img src="{{ asset('fitlife-assets/images/about-banner.png') }}" width="660" height="648" loading="lazy" alt="about banner"
+            <img src="{{ asset('fitlife-assets/images/about-banner.png') }}" width="660" height="648" loading="lazy" decoding="async" alt="about banner"
                 class="w-100">
-
-            <img src="{{ asset('fitlife-assets/images/about-circle-one.png') }}" width="660" height="534" loading="lazy" aria-hidden="true"
+ 
+            <img src="{{ asset('fitlife-assets/images/about-circle-one.png') }}" width="660" height="534" loading="lazy" decoding="async" aria-hidden="true"
                 alt="" class="circle circle-1">
-            <img src="{{ asset('fitlife-assets/images/about-circle-two.png') }}" width="660" height="534" loading="lazy" aria-hidden="true"
+            <img src="{{ asset('fitlife-assets/images/about-circle-two.png') }}" width="660" height="534" loading="lazy" decoding="async" aria-hidden="true"
                 alt="" class="circle circle-2">
-
-            <img src="{{ asset('fitlife-assets/images/fitness.png') }}" width="650" height="154" loading="lazy" alt="fitness"
+ 
+            <img src="{{ asset('fitlife-assets/images/fitness.png') }}" width="650" height="154" loading="lazy" decoding="async" alt="fitness"
                 class="abs-img w-100">
         </div>
 

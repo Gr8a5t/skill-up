@@ -18,11 +18,7 @@
         href="https://fonts.googleapis.com/css2?family=Catamaran:wght@600;700;800;900&family=Rubik:wght@400;500;800&display=swap"
         rel="stylesheet">
 
-    <link rel="preload" as="image" href="{{ asset('fitlife-assets/images/hero-banner.png') }}">
-    <link rel="preload" as="image" href="{{ asset('fitlife-assets/images/hero-circle-one.png') }}">
-    <link rel="preload" as="image" href="{{ asset('fitlife-assets/images/hero-circle-two.png') }}">
-    <link rel="preload" as="image" href="{{ asset('fitlife-assets/images/heart-rate.svg') }}">
-    <link rel="preload" as="image" href="{{ asset('fitlife-assets/images/calories.svg') }}">
+    <link rel="preload" as="image" href="{{ asset('fitlife-assets/images/hero-banner.png') }}" fetchpriority="high">
 </head>
 
 <body id="top">

@@ -9,7 +9,7 @@
             
 
             
-            <img src="{{ asset('fitlife-assets/images/footer-logo.png') }}" alt="">
+            <img src="{{ asset('fitlife-assets/images/footer-logo.png') }}" alt="" loading="lazy" decoding="async">
         </a>
 
           <p class="footer-brand-text">

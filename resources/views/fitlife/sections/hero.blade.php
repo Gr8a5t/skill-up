@@ -22,7 +22,7 @@
         <div class="hero-banner">
 
             <img src="{{ asset('fitlife-assets/images/hero-banner.png') }}" width="660" height="753"
-                alt="hero banner" class="w-100">
+                alt="hero banner" class="w-100" fetchpriority="high" decoding="async">
 
             <img src="{{ asset('fitlife-assets/images/hero-circle-one.png') }}" width="666" height="666"
                 aria-hidden="true" alt="" class="circle circle-1">
