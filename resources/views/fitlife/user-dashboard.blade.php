@@ -195,9 +195,10 @@
         <div class="nav-section">
             <div class="nav-title">Overview</div>
             <a href="{{ route('dashboard') }}" class="nav-link active"><ion-icon name="grid-outline"></ion-icon> Dashboard</a>
-            <a href="{{ route('paths') }}" class="nav-link"><ion-icon name="map-outline"></ion-icon> Paths</a>
             <a href="{{ route('courses') }}" class="nav-link"><ion-icon name="book-outline"></ion-icon> Courses</a>
-            <a href="{{ route('news.index') }}" class="nav-link"><ion-icon name="chatbubbles-outline"></ion-icon> Chats</a>
+            <a href="{{ route('paths') }}" class="nav-link"><ion-icon name="map-outline"></ion-icon> Paths</a>
+            
+            <a href="{{ route('dashboard.chats') }}" class="nav-link"><ion-icon name="chatbubbles-outline"></ion-icon> Chats</a>
         </div>
         
         <div class="nav-section">

@@ -827,4 +827,50 @@ class FitlifeController extends Controller
 
         return view('fitlife.user-dashboard', compact('continueWatching', 'lessons', 'mentors'));
     }
+
+    public function chats()
+    {
+        $communities = [
+            ['id' => 1, 'name' => 'General', 'initial' => 'G', 'color' => '#ff4500'],
+            ['id' => 2, 'name' => 'Coding', 'initial' => 'C', 'color' => '#3aa8f2'],
+            ['id' => 3, 'name' => 'Design', 'initial' => 'D', 'color' => '#8e54e9'],
+            ['id' => 4, 'name' => 'Branding', 'initial' => 'B', 'color' => '#ff4aa0'],
+        ];
+
+        $channels = [
+            ['name' => 'announcements', 'type' => 'text'],
+            ['name' => 'general-chat', 'type' => 'text'],
+            ['name' => 'help-desk', 'type' => 'text'],
+            ['name' => 'project-ideas', 'type' => 'text'],
+        ];
+
+        $messages = [
+            [
+                'username' => 'Padhang Satrio',
+                'avatar' => 'PS',
+                'time' => 'Today at 10:24 AM',
+                'content' => 'Hey everyone! Just released the new UI/UX module. Check it out in the dashboard.'
+            ],
+            [
+                'username' => 'Bagas Mahpie',
+                'avatar' => 'BM',
+                'time' => 'Today at 10:28 AM',
+                'content' => 'Awesome! I was waiting for this. The structure looks much cleaner now.'
+            ],
+            [
+                'username' => 'Sir Dandy',
+                'avatar' => 'SD',
+                'time' => 'Today at 11:05 AM',
+                'content' => 'Is there any group working on the product design sprint this week?'
+            ],
+            [
+                'username' => 'Jhon Tosan',
+                'avatar' => 'JT',
+                'time' => 'Today at 11:12 AM',
+                'content' => 'Yes, we have a small team on the career-ready portfolio path if you want to join!'
+            ],
+        ];
+
+        return view('fitlife.chats', compact('communities', 'channels', 'messages'));
+    }
 }
