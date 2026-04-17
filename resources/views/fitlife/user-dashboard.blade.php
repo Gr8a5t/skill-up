@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="icon" href="{{ asset('favicon4.png?v=2') }}" type="image/png">
     <link rel="stylesheet" href="{{ asset('fitlife-assets/css/style.css') }}">
     <style>
         :root {
