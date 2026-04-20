@@ -47,7 +47,8 @@
 
         .friends-list { padding: 0 var(--padding-side); display: flex; flex-direction: column; gap: 16px; }
         .friend-item { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-        .friend-avatar { width: 36px; height: 36px; border-radius: 50%; background: #e0e9f8; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #1c1c1c; font-size: 1.2rem; flex-shrink: 0; }
+        .friend-avatar { width: 36px; height: 36px; border-radius: 50%; background: #e0e9f8; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #1c1c1c; font-size: 1.2rem; flex-shrink: 0; overflow: hidden; }
+        .friend-avatar img { width: 100%; height: 100%; object-fit: cover; }
         .friend-info { display: flex; flex-direction: column; }
         .friend-name { font-size: 1.3rem; font-weight: 700; color: var(--text-main); }
         .friend-role { font-size: 1.1rem; color: var(--text-mut); }
@@ -71,10 +72,11 @@
         
         /* 1. Server Rail */
         .server-rail { width: 72px; background: var(--server-rail-bg); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; align-items: center; padding: 12px 0; gap: 12px; flex-shrink: 0; overflow-y: auto; }
-        .server-icon { width: 48px; height: 48px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 700; color: var(--text-main); cursor: pointer; transition: 0.2s; border: 1px solid var(--border-color); position: relative;}
-        .server-icon:hover { border-radius: 16px; background: var(--brand-primary); color: #fff; border-color: var(--brand-primary); }
-        .server-icon.active { border-radius: 16px; background: var(--brand-primary); color: #fff; border-color: var(--brand-primary); }
+        .server-icon { width: 48px; height: 48px; border-radius: 50%; background: #fff; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 700; color: var(--text-main); cursor: pointer; transition: 0.2s; border: 1px solid var(--border-color); position: relative; overflow: hidden; }
+        .server-icon:hover { border-radius: 16px; border-color: var(--brand-primary); transform: scale(1.05); }
+        .server-icon.active { border-radius: 16px; border-color: var(--brand-primary); }
         .server-icon.active::before { content: ''; position: absolute; left: -14px; top: 50%; transform: translateY(-50%); width: 4px; height: 32px; background: var(--brand-primary); border-radius: 0 4px 4px 0; }
+        .server-icon img { width: 100%; height: 100%; object-fit: cover; }
         
         /* 2. Channel Pane */
         .channel-pane { width: 240px; background: var(--channel-bg); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; flex-shrink: 0; }
@@ -105,6 +107,7 @@
         .message-feed { flex-grow: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 24px; }
         .message { display: flex; gap: 16px; }
         .msg-avatar { width: 44px; height: 44px; border-radius: 50%; background: #f0f4f8; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-weight: 800; color: var(--text-main); font-size: 1.4rem; overflow: hidden; border: 1px solid var(--border-color); }
+        .msg-avatar img { width: 100%; height: 100%; object-fit: cover; }
         .msg-content { flex-grow: 1; }
         .msg-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
         .msg-user { font-weight: 800; font-size: 1.4rem; color: var(--text-main); }
@@ -130,6 +133,16 @@
         .ch-search { position: relative; width: 180px; }
         .ch-search input { width: 100%; border: 1px solid var(--border-color); background: var(--bg-body); padding: 6px 10px 6px 30px; border-radius: 15px; font-size: 1.2rem; font-family: inherit; }
         .ch-search ion-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 1.4rem; color: var(--text-mut); }
+
+        /* Mentor Specific Styling */
+        .msg-mentor .msg-user { color: var(--brand-primary); }
+        .mentor-badge { background: var(--brand-primary); color: #fff; font-size: 0.9rem; font-weight: 800; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; margin-left: 6px; }
+        .msg-mentor { background: rgba(255, 69, 0, 0.02); border-radius: 8px; padding: 8px; margin-left: -8px; margin-right: -8px; }
+        
+        .member-group-title { font-size: 1rem; font-weight: 800; color: var(--text-mut); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; margin-top: 20px; }
+        .member-group-title:first-child { margin-top: 0; }
+        .friend-item.is-mentor .friend-name { color: var(--brand-primary); }
+        .online-dot { width: 8px; height: 8px; border-radius: 50%; background: #23a55a; margin-left: auto; }
         
         @media (max-width: 900px) {
             .sidebar { position: fixed; left: -260px; z-index: 1000; transition: 0.3s; }
@@ -206,8 +219,12 @@
             <!-- 1. Server Rail -->
             <div class="server-rail">
                 @foreach($communities as $comm)
-                <div class="server-icon {{ $loop->first ? 'active' : '' }}" title="{{ $comm['name'] }}" style="--hover-color: {{ $comm['color'] }}">
-                    {{ $comm['initial'] }}
+                <div class="server-icon {{ $loop->first ? 'active' : '' }}" title="{{ $comm['name'] }}">
+                    @if(isset($comm['image']))
+                        <img src="{{ $comm['image'] }}" alt="{{ $comm['name'] }}">
+                    @else
+                        {{ $comm['initial'] }}
+                    @endif
                 </div>
                 @endforeach
                 <div class="server-icon" style="border-style: dashed; color: var(--text-mut);">
@@ -234,7 +251,9 @@
                 </div>
 
                 <div class="user-bar">
-                    <div class="user-avatar" style="width: 32px; height: 32px; font-size: 1.1rem;">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</div>
+                    <div class="user-avatar" style="width: 32px; height: 32px; font-size: 1.1rem; overflow: hidden; border: 1px solid var(--border-color);">
+                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop" alt="User Profile" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
                     <div class="ub-info">
                         <span class="ub-name">{{ auth()->user()->name }}</span>
                         <span class="ub-status">#{{ auth()->user()->id }}</span>
@@ -269,11 +288,20 @@
 
                 <div class="message-feed">
                     @foreach($messages as $msg)
-                    <div class="message">
-                        <div class="msg-avatar">{{ $msg['avatar'] }}</div>
+                    <div class="message {{ $msg['username'] == 'Padhang Satrio' ? 'msg-mentor' : '' }}">
+                        <div class="msg-avatar">
+                            @if(isset($msg['avatar']))
+                                <img src="{{ $msg['avatar'] }}" alt="{{ $msg['username'] }}">
+                            @else
+                                {{ $msg['initial'] }}
+                            @endif
+                        </div>
                         <div class="msg-content">
                             <div class="msg-meta">
                                 <span class="msg-user">{{ $msg['username'] }}</span>
+                                @if($msg['username'] == 'Padhang Satrio')
+                                    <span class="mentor-badge">Mentor</span>
+                                @endif
                                 <span class="msg-time">{{ $msg['time'] }}</span>
                             </div>
                             <div class="msg-body">{{ $msg['content'] }}</div>
@@ -294,15 +322,37 @@
 
             <!-- 4. Members Pane -->
             <div class="members-pane">
-                <div class="nav-title" style="padding:0">Online — 4</div>
+                <div class="member-group-title">Mentors — 2</div>
+                <div class="friends-list" style="padding:0">
+                    <div class="friend-item is-mentor">
+                        <div class="friend-avatar" style="width:32px; height:32px; font-size:1rem; border: 2px solid var(--brand-primary);">
+                            <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop" alt="Mentor">
+                        </div>
+                        <span class="friend-name" style="font-size:1.2rem">Padhang Satrio</span>
+                        <div class="online-dot"></div>
+                    </div>
+                    <div class="friend-item is-mentor">
+                        <div class="friend-avatar" style="width:32px; height:32px; font-size:1rem; border: 2px solid var(--brand-primary);">
+                            <img src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=100&h=100&fit=crop" alt="Mentor">
+                        </div>
+                        <span class="friend-name" style="font-size:1.2rem">Bagas Mahpie</span>
+                        <div class="online-dot"></div>
+                    </div>
+                </div>
+
+                <div class="member-group-title">Learners — 12</div>
                 <div class="friends-list" style="padding:0">
                     <div class="friend-item">
-                        <div class="friend-avatar" style="width:32px; height:32px; font-size:1rem;">PS</div>
-                        <span class="friend-name" style="font-size:1.2rem">Padhang Satrio</span>
+                        <div class="friend-avatar" style="width:32px; height:32px; font-size:1rem;">
+                            <img src="https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=100&h=100&fit=crop" alt="Learner">
+                        </div>
+                        <span class="friend-name" style="font-size:1.2rem">Sir Dandy</span>
                     </div>
                     <div class="friend-item">
-                        <div class="friend-avatar" style="width:32px; height:32px; font-size:1rem;">BM</div>
-                        <span class="friend-name" style="font-size:1.2rem">Bagas Mahpie</span>
+                        <div class="friend-avatar" style="width:32px; height:32px; font-size:1rem;">
+                            <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop" alt="Learner">
+                        </div>
+                        <span class="friend-name" style="font-size:1.2rem">Jhon Tosan</span>
                     </div>
                 </div>
             </div>
