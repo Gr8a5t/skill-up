@@ -407,6 +407,8 @@ document.querySelectorAll('.vbtn').forEach(btn => {
                 }
             }
         });
+    });
+});
 </script>
 
 @endsection
