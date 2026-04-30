@@ -19,6 +19,16 @@
         rel="stylesheet">
 
     <link rel="preload" as="image" href="{{ asset('fitlife-assets/images/hero-banner.png') }}" fetchpriority="high">
+    <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3GE48NCHC5"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-3GE48NCHC5');
+</script>
+
 </head>
 
 <body id="top">
