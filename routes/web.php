@@ -33,6 +33,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/courses', [FitlifeController::class, 'courses'])->name('courses');
     Route::get('/courses/{slug}', [FitlifeController::class, 'showCourse'])->name('courses.show');
     Route::get('/paths/{slug}/learn', [FitlifeController::class, 'learn'])->name('paths.learn');
+    Route::get('/courses/{slug}/learn', [FitlifeController::class, 'courseLearn'])->name('courses.learn');
     Route::post('/api/progress', [FitlifeController::class, 'updateProgress'])->name('paths.progress');
     
 });

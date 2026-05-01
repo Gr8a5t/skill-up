@@ -54,9 +54,77 @@ class FitlifeController extends Controller
 
     public function courses()
     {
-        $courses = $this->loadCourseraCourses(120);
+        $courses = [
+            [
+                'slug' => 'ux-basics',
+                'title' => 'Mastering UX From Basics to Brilliance',
+                'level' => 'Advance',
+                'category' => 'UX design',
+                'tags' => ['UX design'],
+                'color' => '#f9f8f3',
+                'icon' => 'folder'
+            ],
+            [
+                'slug' => 'become-designer',
+                'title' => 'Become the Designer Users Love',
+                'level' => 'Medium',
+                'category' => 'UX design',
+                'tags' => ['UX design', 'UI design'],
+                'color' => '#f0f4f1',
+                'icon' => 'create'
+            ],
+            [
+                'slug' => 'psychology-design',
+                'title' => 'The Hidden Psychology of UI & UX Design',
+                'level' => 'Junior',
+                'category' => 'Design psychology',
+                'tags' => ['Design psychology', 'Visual design', 'Visual design'],
+                'color' => '#f3f7f0',
+                'icon' => 'layers'
+            ],
+            [
+                'slug' => 'ui-practice',
+                'title' => 'World-Class UI Design in Practice',
+                'level' => 'Medium',
+                'category' => 'Minimal UI design',
+                'tags' => ['Minimal UI design', 'Visual design'],
+                'color' => '#f2f2f4',
+                'icon' => 'color-palette'
+            ],
+        ];
 
         return view('fitlife.courses', compact('courses'));
+    }
+
+    public function courseLearn(string $slug)
+    {
+        // Dummy data for the specific course
+        $course = [
+            'title' => 'React for Beginners - Build your first web app',
+            'category' => 'Frontend Development',
+            'level' => 'Beginner',
+            'lessons_count' => 12,
+            'duration' => '3h 45min',
+            'video_id' => 'SqcY0GlETPk', // Sample React video
+            'recap' => 'In this lesson, we explored the fundamental building blocks of React: **Components**. We learned that components are independent and reusable bits of code. They serve the same purpose as JavaScript functions but work in isolation and return HTML.',
+            'concepts' => [
+                'How to create and export a functional component',
+                'Understanding JSX (JavaScript XML) syntax rules',
+                'Common errors beginners face (e.g., adjacent JSX elements)',
+                'Rendering components inside other components'
+            ]
+        ];
+
+        $lessons = [
+            ['title' => 'Introduction to React', 'time' => '5:12', 'progress' => 100],
+            ['title' => 'How React Works', 'time' => '8:24', 'progress' => 100],
+            ['title' => 'What is a Component?', 'time' => '11:02', 'progress' => 75, 'active' => true],
+            ['title' => 'JSX Basics & Syntax', 'time' => '14:32', 'progress' => 0],
+            ['title' => 'Quiz - Module Fundamentals', 'time' => '17:56', 'progress' => 0],
+            ['title' => 'Reusable Components', 'time' => '23:12', 'progress' => 0],
+        ];
+
+        return view('fitlife.course-learn', compact('course', 'lessons'));
     }
 
     public function showCourse(string $slug)
@@ -796,6 +864,12 @@ class FitlifeController extends Controller
                 'mentor' => 'Padhang Satrio',
                 'image' => asset('fitlife-assets/images/blog-3.jpg')
             ],
+            [
+                'title' => 'Mastering App Marketing & Growth Hacking',
+                'category' => 'MARKETING',
+                'mentor' => 'Zakir Horizontal',
+                'image' => asset('fitlife-assets/images/blog-4.jpg')
+            ],
         ];
 
         $lessons = [
@@ -847,6 +921,13 @@ class FitlifeController extends Controller
                 'avatar' => 'https://i.pravatar.cc/150?u=owen',
                 'unread' => false,
             ],
+            [
+                'name' => 'Erin Pope',
+                'time' => '15h',
+                'message' => 'Hey Lux, welcome to the Content Academy! I work with ...',
+                'avatar' => 'https://i.pravatar.cc/150?u=erin',
+                'unread' => false,
+            ],
         ];
 
         return view('fitlife.user-dashboard', compact('continueWatching', 'lessons', 'mentors', 'conversations'));
@@ -892,6 +973,12 @@ class FitlifeController extends Controller
             ],
         ];
 
-        return view('fitlife.chats', compact('conversations'));
+        $activeMessages = [
+            ['sender' => 'Ankit Chaudhary', 'time' => '1:30 PM', 'text' => 'Hey! Have you seen the new design update?', 'is_me' => false],
+            ['sender' => 'You', 'time' => '1:32 PM', 'text' => 'Not yet, just jumping in now.', 'is_me' => true],
+            ['sender' => 'Ankit Chaudhary', 'time' => '1:35 PM', 'text' => 'It looks great. Your channel will be rock crazy if you can implement this.', 'is_me' => false],
+        ];
+
+        return view('fitlife.chats', compact('conversations', 'activeMessages'));
     }
 }
