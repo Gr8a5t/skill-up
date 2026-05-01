@@ -825,56 +825,73 @@ class FitlifeController extends Controller
             ['name' => 'Leonardo samsul', 'role' => 'Mentor', 'avatar' => 'LS'],
         ];
 
-        return view('fitlife.user-dashboard', compact('continueWatching', 'lessons', 'mentors'));
+        $conversations = [
+            [
+                'name' => 'Ankit Chaudhary',
+                'time' => '1h',
+                'message' => 'your channel will be rock crazy if you can implement th...',
+                'avatar' => 'https://i.pravatar.cc/150?u=ankit',
+                'unread' => false,
+            ],
+            [
+                'name' => 'Linden Clarkson (1)',
+                'time' => '5h',
+                'message' => 'Hey Lux, welcome to Amplify Views! To get the most ou...',
+                'avatar' => 'https://i.pravatar.cc/150?u=linden',
+                'unread' => true,
+            ],
+            [
+                'name' => 'Owen Popelycher',
+                'time' => '8h',
+                'message' => 'Hey Lux?',
+                'avatar' => 'https://i.pravatar.cc/150?u=owen',
+                'unread' => false,
+            ],
+        ];
+
+        return view('fitlife.user-dashboard', compact('continueWatching', 'lessons', 'mentors', 'conversations'));
     }
 
     public function chats()
     {
-        $communities = [
-            ['id' => 1, 'name' => 'General', 'image' => 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=100&h=100&fit=crop', 'initial' => 'G', 'color' => '#ff4500'],
-            ['id' => 2, 'name' => 'Coding', 'image' => 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=100&h=100&fit=crop', 'initial' => 'C', 'color' => '#3aa8f2'],
-            ['id' => 3, 'name' => 'Design', 'image' => 'https://images.unsplash.com/photo-1558655146-d09347e92766?w=100&h=100&fit=crop', 'initial' => 'D', 'color' => '#8e54e9'],
-            ['id' => 4, 'name' => 'Branding', 'image' => 'https://images.unsplash.com/photo-1560171901-1492ba6f7332?w=100&h=100&fit=crop', 'initial' => 'B', 'color' => '#ff4aa0'],
-        ];
-
-        $channels = [
-            ['name' => 'announcements', 'type' => 'text'],
-            ['name' => 'general-chat', 'type' => 'text'],
-            ['name' => 'help-desk', 'type' => 'text'],
-            ['name' => 'project-ideas', 'type' => 'text'],
-        ];
-
-        $messages = [
+        $conversations = [
             [
-                'username' => 'Padhang Satrio',
-                'avatar' => 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop',
-                'initial' => 'PS',
-                'time' => 'Today at 10:24 AM',
-                'content' => 'Hey everyone! Just released the new UI/UX module. Check it out in the dashboard.'
+                'name' => 'Ankit Chaudhary',
+                'time' => '1h',
+                'message' => 'your channel will be rock crazy if you can implement th...',
+                'avatar' => 'https://i.pravatar.cc/150?u=ankit',
+                'unread' => false,
             ],
             [
-                'username' => 'Bagas Mahpie',
-                'avatar' => 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=100&h=100&fit=crop',
-                'initial' => 'BM',
-                'time' => 'Today at 10:28 AM',
-                'content' => 'Awesome! I was waiting for this. The structure looks much cleaner now.'
+                'name' => 'Linden Clarkson (1)',
+                'time' => '5h',
+                'message' => 'Hey Lux, welcome to Amplify Views! To get the most ou...',
+                'avatar' => 'https://i.pravatar.cc/150?u=linden',
+                'unread' => true,
             ],
             [
-                'username' => 'Sir Dandy',
-                'avatar' => 'https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=100&h=100&fit=crop',
-                'initial' => 'SD',
-                'time' => 'Today at 11:05 AM',
-                'content' => 'Is there any group working on the product design sprint this week?'
+                'name' => 'Owen Popelycher',
+                'time' => '8h',
+                'message' => 'Hey Lux?',
+                'avatar' => 'https://i.pravatar.cc/150?u=owen',
+                'unread' => false,
             ],
             [
-                'username' => 'Jhon Tosan',
-                'avatar' => 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop',
-                'initial' => 'JT',
-                'time' => 'Today at 11:12 AM',
-                'content' => 'Yes, we have a small team on the career-ready portfolio path if you want to join!'
+                'name' => 'Erin Pope',
+                'time' => '15h',
+                'message' => 'Hey Lux, welcome to the Content Academy! I work with ...',
+                'avatar' => 'https://i.pravatar.cc/150?u=erin',
+                'unread' => false,
+            ],
+            [
+                'name' => 'Money Maxxing',
+                'time' => '16h',
+                'message' => 'Yoo Whatsup Lux, welcome! Go check this out now http...',
+                'avatar' => 'https://i.pravatar.cc/150?u=money',
+                'unread' => false,
             ],
         ];
 
-        return view('fitlife.chats', compact('communities', 'channels', 'messages'));
+        return view('fitlife.chats', compact('conversations'));
     }
 }

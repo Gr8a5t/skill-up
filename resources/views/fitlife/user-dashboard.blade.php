@@ -181,6 +181,57 @@
             .lesson-table td::before { content: attr(data-label); font-weight: 700; color: var(--text-mut); text-transform: uppercase; font-size: 1rem; float: left; }
             .lesson-table td:last-child { padding-bottom: 20px; }
         }
+
+        /* Recent Chats Widget */
+        .chat-widget { background: var(--bg-surface); border-radius: 12px; border: 1px solid var(--border-color); overflow: hidden; margin-bottom: 30px; }
+        .chat-widget-header { padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); }
+        .chat-widget-list { display: flex; flex-direction: column; }
+        .cw-item { display: flex; padding: 12px 20px; gap: 12px; border-bottom: 1px solid #f2f2f2; text-decoration: none; color: inherit; align-items: center; }
+        .cw-item:last-child { border-bottom: none; }
+        .cw-item:hover { background: #fafafa; }
+        .cw-avatar { width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0; overflow: hidden; border: 1px solid #eee; }
+        .cw-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .cw-info { flex-grow: 1; min-width: 0; }
+        .cw-name { font-size: 1.3rem; font-weight: 700; color: #000; margin-bottom: 2px; }
+        .cw-text { font-size: 1.2rem; color: var(--text-mut); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .cw-unread { width: 8px; height: 8px; border-radius: 50%; background: var(--brand-primary); }
+
+        /* Bottom Nav for Mobile */
+        .mobile-nav { display: none; }
+
+        @media (max-width: 992px) {
+            .mobile-nav {
+                display: flex;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                background: var(--bg-surface);
+                border-top: 1px solid var(--border-color);
+                z-index: 1001;
+                padding: 12px 0;
+                justify-content: space-around;
+                align-items: center;
+                box-shadow: 0 -5px 15px rgba(0,0,0,0.05);
+                padding-bottom: env(safe-area-inset-bottom, 12px);
+            }
+            .mobile-nav-link {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                color: var(--text-mut);
+                text-decoration: none;
+                font-size: 1.1rem;
+                font-weight: 700;
+                gap: 4px;
+            }
+            .mobile-nav-link.active { color: var(--brand-primary); }
+            .mobile-nav-link ion-icon { font-size: 2.2rem; }
+            
+            body { padding-bottom: 80px; }
+            
+            .hamburger-btn { display: none !important; }
+        }
     </style>
 </head>
 <body>
@@ -251,7 +302,7 @@
                 <input type="text" class="search-input" placeholder="Search your course....">
             </div>
             <div class="topbar-right">
-                <a href="#" class="icon-btn"><ion-icon name="mail-outline"></ion-icon></a>
+                <a href="{{ route('dashboard.chats') }}" class="icon-btn"><ion-icon name="chatbubbles-outline"></ion-icon></a>
                 <a href="#" class="icon-btn"><ion-icon name="notifications-outline"></ion-icon></a>
                 <div class="user-profile">
                     <div class="user-avatar">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</div>
@@ -326,6 +377,31 @@
                         </div>
                     </div>
                     @endforeach
+                </div>
+
+                <div class="section-hdr" style="margin-top: 40px;">
+                    <h2 class="section-title">Recent Chats</h2>
+                    <a href="{{ route('dashboard.chats') }}" style="color:var(--brand-primary); font-weight:700; font-size:1.3rem; text-decoration:none;">Open App</a>
+                </div>
+
+                <div class="chat-widget">
+                    <div class="chat-widget-list">
+                        @foreach($conversations as $chat)
+                        <a href="{{ route('dashboard.chats') }}" class="cw-item">
+                            <div class="cw-avatar">
+                                <img src="{{ $chat['avatar'] }}" alt="{{ $chat['name'] }}">
+                            </div>
+                            <div class="cw-info">
+                                <div class="cw-name">{{ $chat['name'] }}</div>
+                                <div class="cw-text">{{ $chat['message'] }}</div>
+                            </div>
+                            <div style="font-size: 1.1rem; color: var(--text-mut); margin-left: 10px;">{{ $chat['time'] }}</div>
+                            @if($chat['unread'])
+                            <div class="cw-unread" style="margin-left: 10px;"></div>
+                            @endif
+                        </a>
+                        @endforeach
+                    </div>
                 </div>
 
                 <div class="section-hdr" style="margin-top: 40px;">
@@ -427,25 +503,52 @@
     </main>
 </div>
 
+<!-- Mobile Bottom Navigation -->
+<nav class="mobile-nav">
+    <a href="{{ route('dashboard') }}" class="mobile-nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+        <ion-icon name="grid-outline"></ion-icon>
+        <span>Home</span>
+    </a>
+    <a href="{{ route('courses') }}" class="mobile-nav-link {{ request()->routeIs('courses') ? 'active' : '' }}">
+        <ion-icon name="book-outline"></ion-icon>
+        <span>Courses</span>
+    </a>
+    <a href="{{ route('paths') }}" class="mobile-nav-link {{ request()->routeIs('paths') ? 'active' : '' }}">
+        <ion-icon name="map-outline"></ion-icon>
+        <span>Paths</span>
+    </a>
+    <a href="{{ route('dashboard.chats') }}" class="mobile-nav-link {{ request()->routeIs('dashboard.chats') ? 'active' : '' }}">
+        <ion-icon name="chatbubbles-outline"></ion-icon>
+        <span>Chats</span>
+    </a>
+    <a href="javascript:void(0)" class="mobile-nav-link" id="mobileMoreBtn">
+        <ion-icon name="menu-outline"></ion-icon>
+        <span>More</span>
+    </a>
+</nav>
+
 <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
 <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
 
 <script>
     const sidebar = document.getElementById('dashboardSidebar');
     const toggle = document.getElementById('sidebarToggle');
+    const mobileMoreBtn = document.getElementById('mobileMoreBtn');
     const overlay = document.getElementById('sidebarOverlay');
 
-    if (toggle && sidebar && overlay) {
-        toggle.addEventListener('click', () => {
-            sidebar.classList.add('open');
-            overlay.classList.add('active');
-        });
+    const openSidebar = () => {
+        sidebar.classList.add('open');
+        overlay.classList.add('active');
+    };
 
-        overlay.addEventListener('click', () => {
-            sidebar.classList.remove('open');
-            overlay.classList.remove('active');
-        });
-    }
+    const closeSidebar = () => {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('active');
+    };
+
+    if (toggle) toggle.addEventListener('click', openSidebar);
+    if (mobileMoreBtn) mobileMoreBtn.addEventListener('click', openSidebar);
+    if (overlay) overlay.addEventListener('click', closeSidebar);
 </script>
 </body>
 </html>
