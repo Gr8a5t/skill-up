@@ -86,7 +86,7 @@
         @foreach($courses as $course)
         <a href="{{ route('courses.learn', $course['slug']) }}" class="course-card" style="text-decoration: none;">
             <div class="card-hdr" style="background-color: {{ $course['color'] }};">
-                <ion-icon name="{{ $course['icon'] }}-outline" class="card-icon"></ion-icon>
+                <ion-icon name="{{ $course['icon'] }}" class="card-icon"></ion-icon>
             </div>
             <div class="card-body">
                 <div class="card-tags">

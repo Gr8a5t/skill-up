@@ -53,6 +53,7 @@
         .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 1.15rem; color: #888; font-weight: 600; margin-bottom: 24px; white-space: nowrap; overflow: hidden; }
         .breadcrumb ion-icon { font-size: 1.4rem; flex-shrink: 0; }
         .breadcrumb span { color: #1c1c1c; background: #f0f2f5; padding: 4px 10px; border-radius: 20px; text-overflow: ellipsis; overflow: hidden; }
+        .breadcrumb a:hover { color: var(--brand-primary); }
 
         .course-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; gap: 20px; }
         .course-title { font-size: 2rem; font-weight: 800; color: #1c1c1c; line-height: 1.2; }
@@ -68,10 +69,15 @@
         .video-box { width: 100%; aspect-ratio: 16/9; min-height: 300px; background: #111; border-radius: 16px; overflow: hidden; margin-bottom: 24px; position: relative; z-index: 5; }
         .video-box iframe { width: 100%; height: 100%; border: none; position: absolute; top: 0; left: 0; }
 
-        .tabs { display: flex; gap: 24px; border-bottom: 1px solid #f2f2f2; margin-bottom: 24px; }
-        .tab-item { padding-bottom: 10px; font-size: 1.3rem; font-weight: 700; color: #888; cursor: pointer; position: relative; display: flex; align-items: center; gap: 6px; }
+        .tabs { display: flex; gap: 24px; border-bottom: 1px solid #f2f2f2; margin-bottom: 24px; overflow-x: auto; flex-wrap: nowrap; padding-bottom: 5px; scrollbar-width: none; }
+        .tabs::-webkit-scrollbar { display: none; }
+        .tab-item { padding-bottom: 10px; font-size: 1.3rem; font-weight: 700; color: #888; cursor: pointer; position: relative; display: flex; align-items: center; gap: 6px; white-space: nowrap; user-select: none; }
         .tab-item.active { color: var(--brand-primary); }
-        .tab-item.active::after { content: ''; position: absolute; bottom: -1px; left: 0; width: 100%; height: 2px; background: var(--brand-primary); }
+        .tab-item.active::after { content: ''; position: absolute; bottom: -1px; left: 0; width: 100%; height: 3px; background: var(--brand-primary); }
+        
+        .tab-pane { display: none; animation: fadeIn 0.3s ease; }
+        .tab-pane.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
         .content-section { margin-bottom: 30px; }
         .section-label { font-size: 1.6rem; font-weight: 800; color: #1c1c1c; margin-bottom: 12px; }
@@ -82,16 +88,39 @@
         .concept-card ion-icon { font-size: 1.6rem; color: #23a55a; flex-shrink: 0; }
         .concept-card p { font-size: 1.25rem; font-weight: 600; color: #444; line-height: 1.3; }
 
+        /* Files & Resources Styles */
+        .resource-card { display: flex; align-items: center; justify-content: space-between; padding: 14px; border: 1px solid #efefef; border-radius: 12px; margin-bottom: 12px; background: #fafafa; }
+        .resource-left { display: flex; align-items: center; gap: 12px; }
+        .resource-icon { width: 40px; height: 40px; border-radius: 8px; background: #f0f4f8; color: var(--brand-primary); display: flex; align-items: center; justify-content: center; font-size: 1.6rem; }
+        .resource-info h4 { font-size: 1.3rem; font-weight: 700; color: #1c1c1c; margin-bottom: 4px; }
+        .resource-info p { font-size: 1.15rem; color: #888; }
+        .download-btn { padding: 6px 14px; font-size: 1.15rem; font-weight: 700; color: #1c1c1c; background: #fff; border: 1px solid #ddd; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+        .download-btn:hover { background: #f4f4f4; border-color: #ccc; }
+
+        /* Comments Styles */
+        .comment-box { margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #efefef; display: flex; gap: 14px; }
+        .comment-avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; }
+        .comment-content h5 { font-size: 1.3rem; font-weight: 700; color: #1c1c1c; display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+        .comment-content h5 span { font-size: 1.05rem; font-weight: 500; color: #999; }
+        .comment-content p { font-size: 1.25rem; color: #444; line-height: 1.5; margin-bottom: 8px; }
+        .comment-actions { display: flex; gap: 16px; font-size: 1.15rem; color: #777; font-weight: 600; }
+        .comment-actions button { background: none; border: none; padding: 0; color: inherit; font: inherit; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: 0.2s; }
+        .comment-actions button:hover { color: var(--brand-primary); }
+        .comment-input-area { display: flex; gap: 14px; margin-bottom: 30px; }
+        .comment-input-area input { flex: 1; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 1.25rem; outline: none; }
+        .comment-input-area input:focus { border-color: var(--brand-primary); }
+        .comment-input-area button { padding: 0 24px; border-radius: 8px; border: none; background: var(--brand-primary); color: #fff; font-size: 1.2rem; font-weight: 700; cursor: pointer; }
+
         /* Learn Sidebar Column */
         .learn-side-col { width: 300px; flex-shrink: 0; padding: 25px; background: #fafafa; overflow-y: auto; height: 100%; }
         
         .progress-widget { background: #fff; border: 1px solid var(--border-color); border-radius: 12px; padding: 14px; display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
         .radial-lg { 
             width: 50px; height: 50px; border-radius: 50%; 
-            background: conic-gradient(var(--brand-primary) 75%, #eee 0); 
+            background: conic-gradient(var(--brand-primary) var(--p), #eee 0); 
             display: flex; align-items: center; justify-content: center; position: relative;
         }
-        .radial-lg::after { content: '75%'; position: absolute; width: 40px; height: 40px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; font-weight: 800; color: #1c1c1c; }
+        .radial-lg .inner-circle { width: 40px; height: 40px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; font-weight: 800; color: #1c1c1c; z-index: 2; }
         .prog-info h4 { font-size: 1.35rem; font-weight: 800; color: #1c1c1c; margin-bottom: 2px; }
         .prog-info p { font-size: 1.15rem; color: #888; font-weight: 500; line-height: 1.3; }
 
@@ -131,7 +160,11 @@
         @media (max-width: 768px) {
             .course-header { flex-direction: column; align-items: flex-start; gap: 16px; }
             .course-title { font-size: 1.8rem; }
-            .action-row { width: 100%; justify-content: space-between; }
+            .action-row { width: 100%; justify-content: flex-start; flex-wrap: wrap; }
+            .learn-main-col { padding: 15px; }
+            .learn-side-col { padding: 15px; }
+            .meta-row { flex-wrap: wrap; gap: 10px; }
+            .video-box { min-height: 200px; }
         }
     </style>
 @endpush
@@ -141,7 +174,7 @@
         <!-- Main Panel -->
         <div class="learn-main-col">
             <nav class="breadcrumb">
-                Courses <ion-icon name="chevron-forward"></ion-icon> 
+                <a href="{{ route('courses') }}" style="text-decoration: none; color: inherit; transition: 0.2s;">Courses</a> <ion-icon name="chevron-forward"></ion-icon> 
                 {{ $course['category'] }} <ion-icon name="chevron-forward"></ion-icon>
                 <span>{{ $course['title'] }}</span>
             </nav>
@@ -162,42 +195,148 @@
             </div>
 
             <div class="video-box">
-                <iframe src="https://www.youtube.com/embed/{{ $course['video_id'] }}?rel=0" allowfullscreen></iframe>
+                <div id="player"></div>
             </div>
 
             <div class="tabs">
-                <div class="tab-item active"><ion-icon name="document-text-outline"></ion-icon> Summary</div>
-                <div class="tab-item"><ion-icon name="folder-open-outline"></ion-icon> Files</div>
-                <div class="tab-item"><ion-icon name="link-outline"></ion-icon> Resources</div>
-                <div class="tab-item"><ion-icon name="chatbubble-ellipses-outline"></ion-icon> Q&A</div>
+                <div class="tab-item active" data-tab="summary"><ion-icon name="document-text-outline"></ion-icon> Summary</div>
+                <div class="tab-item" data-tab="files"><ion-icon name="folder-open-outline"></ion-icon> Files</div>
+                <div class="tab-item" data-tab="resources"><ion-icon name="link-outline"></ion-icon> Resources</div>
+                <div class="tab-item" data-tab="comments"><ion-icon name="chatbubble-ellipses-outline"></ion-icon> Comments</div>
             </div>
 
-            <section class="content-section">
-                <h2 class="section-label">Lesson Recap</h2>
-                <div class="section-text">
-                    {{ $course['recap'] }}
+            <div class="tab-content">
+                <!-- SUMMARY TAB -->
+                <div id="tab-summary" class="tab-pane active">
+                    <section class="content-section">
+                        <h2 class="section-label">Lesson Recap</h2>
+                        <div class="section-text">
+                            {{ $course['recap'] }}
+                        </div>
+                    </section>
+        
+                    <section class="content-section">
+                        <h2 class="section-label">Key Concepts</h2>
+                        <div class="concepts-grid">
+                            @foreach($course['concepts'] as $concept)
+                            <div class="concept-card">
+                                <ion-icon name="checkmark-circle"></ion-icon>
+                                <p>{{ $concept }}</p>
+                            </div>
+                            @endforeach
+                        </div>
+                    </section>
                 </div>
-            </section>
 
-            <section class="content-section">
-                <h2 class="section-label">Key Concepts</h2>
-                <div class="concepts-grid">
-                    @foreach($course['concepts'] as $concept)
-                    <div class="concept-card">
-                        <ion-icon name="checkmark-circle"></ion-icon>
-                        <p>{{ $concept }}</p>
-                    </div>
-                    @endforeach
+                <!-- FILES TAB -->
+                <div id="tab-files" class="tab-pane">
+                    <section class="content-section">
+                        <h2 class="section-label">Source Code & Assets</h2>
+                        <div class="resource-card">
+                            <div class="resource-left">
+                                <div class="resource-icon"><ion-icon name="logo-github"></ion-icon></div>
+                                <div class="resource-info">
+                                    <h4>Starter Template</h4>
+                                    <p>ZIP file - 2.4 MB</p>
+                                </div>
+                            </div>
+                            <button class="download-btn">Download</button>
+                        </div>
+                        <div class="resource-card">
+                            <div class="resource-left">
+                                <div class="resource-icon"><ion-icon name="document-text"></ion-icon></div>
+                                <div class="resource-info">
+                                    <h4>Lesson Slide Deck</h4>
+                                    <p>PDF Document - 5.1 MB</p>
+                                </div>
+                            </div>
+                            <button class="download-btn">Download</button>
+                        </div>
+                    </section>
                 </div>
-            </section>
+
+                <!-- RESOURCES TAB -->
+                <div id="tab-resources" class="tab-pane">
+                    <section class="content-section">
+                        <h2 class="section-label">Helpful Links</h2>
+                        <a href="#" style="text-decoration: none; color: inherit; display: block;" class="resource-card">
+                            <div class="resource-left">
+                                <div class="resource-icon" style="background:#fdfcf0; color: #e5b300;"><ion-icon name="book-outline"></ion-icon></div>
+                                <div class="resource-info">
+                                    <h4>Official Documentation</h4>
+                                    <p>Read the official setup guides.</p>
+                                </div>
+                            </div>
+                            <ion-icon name="open-outline" style="font-size: 1.8rem; color: #bbb;"></ion-icon>
+                        </a>
+                        <a href="#" style="text-decoration: none; color: inherit; display: block;" class="resource-card">
+                            <div class="resource-left">
+                                <div class="resource-icon" style="background:#f0e6fa; color: #7f39fb;"><ion-icon name="library-outline"></ion-icon></div>
+                                <div class="resource-info">
+                                    <h4>Community Cheat Sheet</h4>
+                                    <p>Interactive web cheat sheet.</p>
+                                </div>
+                            </div>
+                            <ion-icon name="open-outline" style="font-size: 1.8rem; color: #bbb;"></ion-icon>
+                        </a>
+                    </section>
+                </div>
+
+                <!-- COMMENTS TAB -->
+                <div id="tab-comments" class="tab-pane">
+                    <section class="content-section">
+                        <h2 class="section-label">Discussion (2)</h2>
+                        
+                        <div class="comment-input-area">
+                            <img src="https://i.pravatar.cc/150?u=current_user" class="comment-avatar" alt="You">
+                            <input type="text" placeholder="Ask a question or share a thought...">
+                            <button>Post</button>
+                        </div>
+
+                        <div class="comment-box">
+                            <img src="https://i.pravatar.cc/150?u=user1" class="comment-avatar" alt="User">
+                            <div class="comment-content">
+                                <h5>Sarah Jenkins <span>• 2 days ago</span></h5>
+                                <p>This explanation finally made it click for me! I was struggling with this concept for weeks. Thank you!</p>
+                                <div class="comment-actions">
+                                    <button><ion-icon name="thumbs-up-outline"></ion-icon> 12</button>
+                                    <button>Reply</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="comment-box">
+                            <img src="https://i.pravatar.cc/150?u=user2" class="comment-avatar" alt="User">
+                            <div class="comment-content">
+                                <h5>Michael Chen <span>• 5 days ago</span></h5>
+                                <p>Is there a specific reason why we don't use the alternative method shown in the documentation?</p>
+                                <div class="comment-actions">
+                                    <button><ion-icon name="thumbs-up-outline"></ion-icon> 4</button>
+                                    <button>Reply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
         </div>
 
         <!-- Sidebar / Curriculum -->
         <div class="learn-side-col">
             <div class="section-label">Course Content</div>
             
+            @php
+                $totalProgress = 0;
+                foreach($lessons as $lesson) {
+                    $totalProgress += $lesson['progress'] ?? 0;
+                }
+                $overallProgress = count($lessons) > 0 ? round($totalProgress / count($lessons)) : 0;
+            @endphp
+
             <div class="progress-widget">
-                <div class="radial-lg"></div>
+                <div class="radial-lg" style="--p: {{ $overallProgress }}%;">
+                    <div class="inner-circle">{{ $overallProgress }}%</div>
+                </div>
                 <div class="prog-info">
                     <h4>Study Progress</h4>
                     <p>Track your learning milestones and where you left off.</p>
@@ -206,16 +345,18 @@
 
             <div class="curriculum-list">
                 @foreach($lessons as $index => $lesson)
-                <div class="curr-item {{ isset($lesson['active']) ? 'active' : '' }}">
-                    <div class="curr-left">
-                        <div class="curr-num">{{ $index + 1 }}</div>
-                        <div class="curr-info">
-                            <h5>{{ $lesson['title'] }}</h5>
-                            <span>{{ $lesson['time'] }}</span>
+                <a href="?v={{ $lesson['video_id'] }}" style="text-decoration: none; color: inherit; display: block;">
+                    <div class="curr-item {{ $lesson['active'] ? 'active' : '' }}">
+                        <div class="curr-left">
+                            <div class="curr-num">{{ $index + 1 }}</div>
+                            <div class="curr-info">
+                                <h5>{{ $lesson['title'] }}</h5>
+                                <span>{{ $lesson['time'] }}</span>
+                            </div>
                         </div>
+                        <div class="radial-sm" style="--p: {{ $lesson['progress'] }}%;"></div>
                     </div>
-                    <div class="radial-sm" style="--p: {{ $lesson['progress'] }}%;"></div>
-                </div>
+                </a>
                 @endforeach
             </div>
         </div>
@@ -223,5 +364,89 @@
 @push('scripts')
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+    
+    <script>
+        // Tab system logic
+        document.querySelectorAll('.tab-item').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active from all tabs and panes
+                document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+                
+                // Add active to clicked tab
+                tab.classList.add('active');
+                
+                // Show matching pane
+                const target = tab.getAttribute('data-tab');
+                const pane = document.getElementById('tab-' + target);
+                if(pane) pane.classList.add('active');
+            });
+        });
+    </script>
+    
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script>
+        var player;
+        var progressInterval;
+
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('player', {
+                videoId: '{{ $course["video_id"] }}',
+                playerVars: {
+                    'rel': 0,
+                    'playsinline': 1
+                },
+                events: {
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        }
+
+        function onPlayerStateChange(event) {
+            // If playing
+            if (event.data == YT.PlayerState.PLAYING) {
+                if(!progressInterval) {
+                    progressInterval = setInterval(updateProgress, 5000); // Poll every 5s
+                }
+            } else {
+                if(progressInterval) {
+                    clearInterval(progressInterval);
+                    progressInterval = null;
+                }
+                if(event.data == YT.PlayerState.PAUSED || event.data == YT.PlayerState.ENDED) {
+                    updateProgress(); // final ping on pause/end
+                }
+            }
+        }
+
+        function updateProgress() {
+            if(!player || !player.getCurrentTime) return;
+
+            let currentTime = player.getCurrentTime();
+            let duration = player.getDuration();
+            if(duration <= 0) return;
+
+            fetch('{{ route("paths.progress") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    course_slug: '{{ $slug }}',
+                    video_id: '{{ $course["video_id"] }}',
+                    progress_seconds: currentTime,
+                    total_seconds: duration
+                })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if(data.status === 'success') {
+                    console.log('Progress updated', data);
+                }
+            })
+            .catch(err => console.error(err));
+        }
+    </script>
 @endpush
 @endsection

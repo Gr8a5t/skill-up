@@ -11,12 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('news_comments', function (Blueprint $table) {
+        Schema::create('course_comments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('news_post_id')->constrained()->onDelete('cascade');
-            $table->string('session_id')->index();
-            $table->string('username')->default('Anonymous');
-            $table->text('content');
             $table->timestamps();
         });
     }
@@ -26,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('news_comments');
+        Schema::dropIfExists('course_comments');
     }
 };

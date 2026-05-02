@@ -52,79 +52,195 @@ class FitlifeController extends Controller
         return view('fitlife.about');
     }
 
+    private function getWebDevCourses()
+    {
+        return [
+            [
+                'slug' => 'html-basics',
+                'title' => 'HTML Crash Course for Beginners',
+                'level' => 'Beginner',
+                'category' => 'Frontend',
+                'tags' => ['HTML', 'Web Design'],
+                'color' => '#fcf6f5',
+                'icon' => 'logo-html5',
+                'playlist_id' => 'PL4cUxeGkcC9ivBf_eKCPIAYXWzLlPAm6G'
+            ],
+            [
+                'slug' => 'css-styling',
+                'title' => 'CSS Crash Course',
+                'level' => 'Beginner',
+                'category' => 'Frontend',
+                'tags' => ['CSS', 'Styling'],
+                'color' => '#f5f9fc',
+                'icon' => 'logo-css3',
+                'playlist_id' => 'PL4cUxeGkcC9gQeDH6xYhmdy-dbOPTgO3C'
+            ],
+            [
+                'slug' => 'modern-javascript',
+                'title' => 'Modern JavaScript Tutorial',
+                'level' => 'Medium',
+                'category' => 'Frontend',
+                'tags' => ['JavaScript', 'ES6'],
+                'color' => '#fcfbf5',
+                'icon' => 'logo-javascript',
+                'playlist_id' => 'PL4cUxeGkcC9haQlqdCQyYmL_27TesCGPC'
+            ],
+            [
+                'slug' => 'php-fundamentals',
+                'title' => 'PHP Tutorial for Beginners',
+                'level' => 'Medium',
+                'category' => 'Backend',
+                'tags' => ['PHP', 'Backend'],
+                'color' => '#f7f5fc',
+                'icon' => 'server-outline',
+                'playlist_id' => 'PL4cUxeGkcC9gksOX3Kd9KPo-O68ncT05o'
+            ],
+            [
+                'slug' => 'laravel-mastery',
+                'title' => 'Laravel Crash Course',
+                'level' => 'Advance',
+                'category' => 'Backend',
+                'tags' => ['Laravel', 'PHP'],
+                'color' => '#fcf5f5',
+                'icon' => 'cube-outline',
+                'playlist_id' => 'PL0eyrZgxdwhy7Woo2VRRDMmTXXYT_iaYO'
+            ],
+            [
+                'slug' => 'react-beginners',
+                'title' => 'React for Beginners',
+                'level' => 'Advance',
+                'category' => 'Frontend',
+                'tags' => ['React', 'JavaScript'],
+                'color' => '#f5fbfc',
+                'icon' => 'logo-react',
+                'playlist_id' => 'PL4cUxeGkcC9gZD-Tvwfod2gaISzfRiP9d'
+            ],
+            [
+                'slug' => 'ai-agents-intro',
+                'title' => 'Building AI Agents',
+                'level' => 'Advance',
+                'category' => 'Artificial Intelligence',
+                'tags' => ['AI', 'Agents'],
+                'color' => '#f9f5fc',
+                'icon' => 'hardware-chip-outline',
+                'playlist_id' => 'PLAqhIrjkxbuWI23v9cThsA9GvCAUhRvKZ'
+            ]
+        ];
+    }
+
     public function courses()
     {
-        $courses = [
-            [
-                'slug' => 'ux-basics',
-                'title' => 'Mastering UX From Basics to Brilliance',
-                'level' => 'Advance',
-                'category' => 'UX design',
-                'tags' => ['UX design'],
-                'color' => '#f9f8f3',
-                'icon' => 'folder'
-            ],
-            [
-                'slug' => 'become-designer',
-                'title' => 'Become the Designer Users Love',
-                'level' => 'Medium',
-                'category' => 'UX design',
-                'tags' => ['UX design', 'UI design'],
-                'color' => '#f0f4f1',
-                'icon' => 'create'
-            ],
-            [
-                'slug' => 'psychology-design',
-                'title' => 'The Hidden Psychology of UI & UX Design',
-                'level' => 'Junior',
-                'category' => 'Design psychology',
-                'tags' => ['Design psychology', 'Visual design', 'Visual design'],
-                'color' => '#f3f7f0',
-                'icon' => 'layers'
-            ],
-            [
-                'slug' => 'ui-practice',
-                'title' => 'World-Class UI Design in Practice',
-                'level' => 'Medium',
-                'category' => 'Minimal UI design',
-                'tags' => ['Minimal UI design', 'Visual design'],
-                'color' => '#f2f2f4',
-                'icon' => 'color-palette'
-            ],
-        ];
+        $courses = $this->getWebDevCourses();
 
         return view('fitlife.courses', compact('courses'));
     }
 
     public function courseLearn(string $slug)
     {
-        // Dummy data for the specific course
+        $youtubeKey = config('services.youtube.key');
+        
+        $allCourses = $this->getWebDevCourses();
+        $courseData = collect($allCourses)->firstWhere('slug', $slug) ?? $allCourses[5];
+        
+        $playlistId = $courseData['playlist_id'];
+        
+        $response = \Illuminate\Support\Facades\Http::get('https://www.googleapis.com/youtube/v3/playlistItems', [
+            'part' => 'snippet',
+            'playlistId' => $playlistId,
+            'maxResults' => 20,
+            'key' => $youtubeKey,
+        ]);
+
+        $items = $response->json()['items'] ?? [];
+
         $course = [
-            'title' => 'React for Beginners - Build your first web app',
-            'category' => 'Frontend Development',
-            'level' => 'Beginner',
-            'lessons_count' => 12,
-            'duration' => '3h 45min',
-            'video_id' => 'SqcY0GlETPk', // Sample React video
-            'recap' => 'In this lesson, we explored the fundamental building blocks of React: **Components**. We learned that components are independent and reusable bits of code. They serve the same purpose as JavaScript functions but work in isolation and return HTML.',
+            'title' => $courseData['title'],
+            'category' => $courseData['category'],
+            'level' => $courseData['level'],
+            'lessons_count' => count($items),
+            'duration' => 'Self Paced', // Duration from YouTube requires another API call, keeping simple
+            'video_id' => $items[0]['snippet']['resourceId']['videoId'] ?? 'SqcY0GlETPk', 
+            'recap' => 'In this course, we will build a modern application from scratch. You will learn about core syntax, state, context, and more.',
             'concepts' => [
-                'How to create and export a functional component',
-                'Understanding JSX (JavaScript XML) syntax rules',
-                'Common errors beginners face (e.g., adjacent JSX elements)',
-                'Rendering components inside other components'
+                'Understanding ' . $courseData['title'] . ' fundamentals',
+                'Managing state and side effects',
+                'Applying styles and components',
+                'Deploying to production'
             ]
         ];
 
-        $lessons = [
-            ['title' => 'Introduction to React', 'time' => '5:12', 'progress' => 100],
-            ['title' => 'How React Works', 'time' => '8:24', 'progress' => 100],
-            ['title' => 'What is a Component?', 'time' => '11:02', 'progress' => 75, 'active' => true],
-            ['title' => 'JSX Basics & Syntax', 'time' => '14:32', 'progress' => 0],
-            ['title' => 'Quiz - Module Fundamentals', 'time' => '17:56', 'progress' => 0],
-            ['title' => 'Reusable Components', 'time' => '23:12', 'progress' => 0],
-        ];
+        // Check active video from request or default to first
+        $activeVideoId = request('v', $course['video_id']);
+        $course['video_id'] = $activeVideoId; // The one currently playing
 
-        return view('fitlife.course-learn', compact('course', 'lessons'));
+        $lessons = [];
+        if (count($items) > 0) {
+            // Fetch user progress for this course
+            $progressRecords = [];
+            if (auth()->check()) {
+                $progressRecords = \App\Models\UserLessonProgress::where('course_slug', $slug)
+                    ->where('user_id', auth()->id())
+                    ->get()->keyBy('video_id');
+            } else {
+                $sessionId = session()->getId();
+                $progressRecords = \App\Models\UserLessonProgress::where('course_slug', $slug)
+                    ->where('session_id', $sessionId)
+                    ->get()->keyBy('video_id');
+            }
+
+            foreach($items as $item) {
+                $vidId = $item['snippet']['resourceId']['videoId'];
+                $progressRec = $progressRecords[$vidId] ?? null;
+                $pct = 0;
+                if ($progressRec && $progressRec->total_seconds > 0) {
+                    $pct = min(100, round(($progressRec->progress_seconds / $progressRec->total_seconds) * 100));
+                }
+
+                $lessons[] = [
+                    'video_id' => $vidId,
+                    'title' => $item['snippet']['title'],
+                    'time' => 'Video', // 'time' removed as it requires extra API calls
+                    'progress' => $pct,
+                    'active' => ($vidId === $activeVideoId),
+                ];
+            }
+        } else {
+            // Fallback if API fails
+            $lessons = [
+                ['video_id' => 'SqcY0GlETPk', 'title' => 'API Failed or No Key', 'time' => '0:00', 'progress' => 0, 'active' => true],
+            ];
+        }
+
+        return view('fitlife.course-learn', compact('course', 'lessons', 'slug'));
+    }
+
+    public function updateCourseProgress(\Illuminate\Http\Request $request)
+    {
+        $request->validate([
+            'course_slug' => 'required|string',
+            'video_id' => 'required|string',
+            'progress_seconds' => 'required|numeric',
+            'total_seconds' => 'required|numeric',
+        ]);
+
+        $userId = auth()->id();
+        $sessionId = session()->getId();
+
+        $progress = \App\Models\UserLessonProgress::updateOrCreate(
+            [
+                'user_id' => $userId,
+                'session_id' => $userId ? null : $sessionId,
+                'course_slug' => $request->course_slug,
+                'video_id' => $request->video_id,
+            ],
+            [
+                'progress_seconds' => $request->progress_seconds,
+                'total_seconds' => $request->total_seconds,
+                'is_completed' => ($request->progress_seconds >= $request->total_seconds * 0.95), // completed if 95% watched
+            ]
+        );
+
+        return response()->json(['status' => 'success', 'progress' => $progress]);
     }
 
     public function showCourse(string $slug)
