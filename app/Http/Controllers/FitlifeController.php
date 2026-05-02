@@ -1046,7 +1046,28 @@ class FitlifeController extends Controller
             ],
         ];
 
-        return view('fitlife.user-dashboard', compact('continueWatching', 'lessons', 'mentors', 'conversations'));
+        // Activity heatmap — count progress updates per day over the last 365 days
+        $userId    = auth()->id();
+        $sessionId = session()->getId();
+
+        $activityRaw = \App\Models\UserLessonProgress::where(function ($q) use ($userId, $sessionId) {
+                if ($userId) $q->where('user_id', $userId);
+                else         $q->where('session_id', $sessionId);
+            })
+            ->where('updated_at', '>=', now()->subDays(365))
+            ->selectRaw('DATE(updated_at) as day, COUNT(*) as count')
+            ->groupBy('day')
+            ->pluck('count', 'day')
+            ->toArray();
+
+        // Build a full 365-day map (today → 364 days ago) keyed by Y-m-d
+        $activityMap = [];
+        for ($i = 364; $i >= 0; $i--) {
+            $date = now()->subDays($i)->format('Y-m-d');
+            $activityMap[$date] = $activityRaw[$date] ?? 0;
+        }
+
+        return view('fitlife.user-dashboard', compact('continueWatching', 'lessons', 'mentors', 'conversations', 'activityMap'));
     }
 
     public function chats()

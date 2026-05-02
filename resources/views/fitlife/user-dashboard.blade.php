@@ -83,11 +83,26 @@
         .stat-greeting { font-size: 1.8rem; font-weight: 800; margin-bottom: 6px; }
         .stat-sub { font-size: 1.2rem; color: var(--text-mut); margin-bottom: 24px; }
         
-        /* Bar Chart Mock */
-        .bar-chart { display: flex; align-items: flex-end; justify-content: space-between; height: 80px; margin-bottom: 10px; border-bottom: 1px dashed var(--border-color); padding-bottom: 10px; }
-        .bar { width: 30%; background: #e0e9f8; border-radius: 4px; transition: 0.3s; }
-        .bar.active { background: var(--brand-primary); height: 100% !important; }
-        .bar-labels { display: flex; justify-content: space-between; font-size: 1.1rem; color: var(--text-mut); }
+        /* Activity Heatmap */
+        .heatmap-wrap { margin-top: 20px; }
+        .heatmap-title { font-size: 1.2rem; font-weight: 700; color: var(--text-mut); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .heatmap-title span { color: var(--brand-primary); font-size: 1.1rem; font-weight: 700; }
+        .heatmap-outer { display: flex; gap: 5px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: thin; scrollbar-color: #ddd transparent; }
+        .heatmap-day-labels { display: flex; flex-direction: column; gap: 3px; padding-top: 18px; flex-shrink: 0; }
+        .heatmap-day-label { height: 11px; font-size: 0.95rem; color: var(--text-mut); line-height: 11px; white-space: nowrap; }
+        .heatmap-right { display: flex; flex-direction: column; min-width: 0; }
+        .heatmap-month-row { display: flex; gap: 3px; height: 16px; margin-bottom: 2px; }
+        .heatmap-month-slot { font-size: 1rem; color: var(--text-mut); white-space: nowrap; flex-shrink: 0; overflow: visible; line-height: 1; }
+        .heatmap-grid { display: flex; gap: 3px; }
+        .heatmap-col { display: flex; flex-direction: column; gap: 3px; }
+        .heatmap-cell { width: 11px; height: 11px; border-radius: 2px; background: #ede9f7; transition: transform 0.12s; cursor: pointer; flex-shrink: 0; }
+        .heatmap-cell:hover { transform: scale(1.4); outline: 1px solid rgba(115,64,224,0.4); }
+        .heatmap-cell[data-level="1"] { background: #c4b0f5; }
+        .heatmap-cell[data-level="2"] { background: #9b77ee; }
+        .heatmap-cell[data-level="3"] { background: #7340e0; }
+        .heatmap-cell[data-level="4"] { background: #4a00c8; }
+        .heatmap-legend { display: flex; align-items: center; gap: 5px; margin-top: 8px; font-size: 1.05rem; color: var(--text-mut); justify-content: flex-end; }
+        .legend-cell { width: 11px; height: 11px; border-radius: 2px; display: inline-block; }
 
         /* Mentor Widget */
         .mentor-widget { background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 16px; padding: 24px; }
@@ -271,17 +286,62 @@
             <div class="stat-greeting">Good Morning {{ explode(' ', auth()->user()->name)[0] }} 🔥</div>
             <div class="stat-sub">Continue your learning to achieve your target!</div>
             
-            <div class="bar-chart">
-                <div class="bar" style="height: 30%;"></div>
-                <div class="bar" style="height: 50%;"></div>
-                <div class="bar" style="height: 20%;"></div>
-                <div class="bar active" style="height: 100%;"></div>
-                <div class="bar" style="height: 40%;"></div>
-            </div>
-            <div class="bar-labels">
-                <span>1-10 Aug</span>
-                <span>11-20 Aug</span>
-                <span>21-30 Aug</span>
+            <div class="heatmap-wrap" id="activity-heatmap">
+                <div class="heatmap-title">
+                    Learning Activity
+                    <span id="heatmap-streak"></span>
+                </div>
+
+                @php
+                    $dates   = array_keys($activityMap);
+                    $counts  = array_values($activityMap);
+                    $columns = array_chunk(array_map(null, $dates, $counts), 7);
+                @endphp
+
+                <div class="heatmap-outer">
+                    <div class="heatmap-day-labels">
+                        <div class="heatmap-day-label">Mon</div>
+                        <div class="heatmap-day-label"></div>
+                        <div class="heatmap-day-label">Wed</div>
+                        <div class="heatmap-day-label"></div>
+                        <div class="heatmap-day-label">Fri</div>
+                        <div class="heatmap-day-label"></div>
+                        <div class="heatmap-day-label"></div>
+                    </div>
+                    <div class="heatmap-right">
+                        <div class="heatmap-month-row" id="heatmap-months"></div>
+                        <div class="heatmap-grid" id="heatmap-grid">
+                            @foreach($columns as $colIdx => $col)
+                            <div class="heatmap-col" data-col="{{ $colIdx }}">
+                                @foreach($col as [$date, $count])
+                                @php
+                                    $level = 0;
+                                    if ($count >= 1) $level = 1;
+                                    if ($count >= 3) $level = 2;
+                                    if ($count >= 5) $level = 3;
+                                    if ($count >= 8) $level = 4;
+                                @endphp
+                                <div class="heatmap-cell"
+                                     data-level="{{ $level }}"
+                                     data-date="{{ $date }}"
+                                     data-count="{{ $count }}"
+                                     title="{{ $count }} {{ $count == 1 ? 'activity' : 'activities' }} on {{ \Carbon\Carbon::parse($date)->format('M j, Y') }}"></div>
+                                @endforeach
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+
+                <div class="heatmap-legend">
+                    Less
+                    <span class="legend-cell" style="background:#ede9f7"></span>
+                    <span class="legend-cell" style="background:#c4b0f5"></span>
+                    <span class="legend-cell" style="background:#9b77ee"></span>
+                    <span class="legend-cell" style="background:#7340e0"></span>
+                    <span class="legend-cell" style="background:#4a00c8"></span>
+                    More
+                </div>
             </div>
         </div>
 
@@ -310,3 +370,49 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+<script>
+(function() {
+    const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+    // Inject month labels above each column where the month changes
+    const grid     = document.getElementById('heatmap-grid');
+    const monthRow = document.getElementById('heatmap-months');
+    if (grid && monthRow) {
+        const cols = [...grid.querySelectorAll('.heatmap-col')];
+        let lastMonth = null;
+        cols.forEach(col => {
+            const firstCell = col.querySelector('.heatmap-cell');
+            const d = firstCell ? new Date(firstCell.dataset.date + 'T00:00:00') : null;
+            const m = d ? d.getMonth() : null;
+
+            const slot = document.createElement('span');
+            slot.className = 'heatmap-month-slot';
+            slot.style.width = '14px';   // 11px + 3px gap
+            slot.style.display = 'inline-block';
+            slot.style.fontSize = '10px';
+
+            if (d && m !== lastMonth) {
+                slot.textContent = MONTHS[m];
+                lastMonth = m;
+            }
+            monthRow.appendChild(slot);
+        });
+    }
+
+    // Streak counter — scan cells newest→oldest
+    const allCells = [...document.querySelectorAll('.heatmap-cell')].reverse();
+    let streak = 0;
+    for (const cell of allCells) {
+        if (parseInt(cell.dataset.count) > 0) streak++;
+        else break;
+    }
+    const streakEl = document.getElementById('heatmap-streak');
+    if (streakEl && streak > 0) {
+        streakEl.textContent = '🔥 ' + streak + ' day streak';
+    }
+})();
+</script>
+@endpush
+
