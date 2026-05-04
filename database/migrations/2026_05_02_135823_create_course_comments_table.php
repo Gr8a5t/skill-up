@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('course_comments', function (Blueprint $table) {
             $table->id();
+            $table->string('course_slug');
+            $table->string('user_name')->default('Guest Student');
+            $table->string('avatar')->nullable();
+            $table->text('content');
+            $table->integer('likes')->default(0);
             $table->timestamps();
         });
     }

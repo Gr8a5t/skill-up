@@ -1009,52 +1009,14 @@ class FitlifeController extends Controller
             ->pluck('course_slug')
             ->toArray();
 
-        // Map progress slugs to course data + compute % per course
-        $continueWatching = [];
-        foreach ($progressedSlugs as $slug) {
-            $courseData = collect($allCourses)->firstWhere('slug', $slug);
-            if (!$courseData) continue;
-
-            // Average progress across all videos in this course
-            $records = \App\Models\UserLessonProgress::where('course_slug', $slug)
-                ->where(function ($q) use ($userId, $sessionId) {
-                    if ($userId) $q->where('user_id', $userId);
-                    else         $q->where('session_id', $sessionId);
-                })
-                ->get();
-
-            $avgPct = 0;
-            if ($records->count() > 0) {
-                $avgPct = $records->avg(function ($r) {
-                    return $r->total_seconds > 0
-                        ? min(100, round(($r->progress_seconds / $r->total_seconds) * 100))
-                        : 0;
-                });
-            }
-
-            $continueWatching[] = [
-                'slug'     => $slug,
-                'title'    => $courseData['title'],
-                'category' => $courseData['category'],
-                'icon'     => $courseData['icon'],
-                'color'    => $courseData['color'],
-                'progress' => round($avgPct),
-                'updated'  => $records->max('updated_at'),
-            ];
-        }
-
-        // If no courses started yet, show first 3 as suggestions
-        if (empty($continueWatching)) {
-            $continueWatching = collect($allCourses)->take(3)->map(fn($c) => [
-                'slug'     => $c['slug'],
-                'title'    => $c['title'],
-                'category' => $c['category'],
-                'icon'     => $c['icon'],
-                'color'    => $c['color'],
-                'progress' => 0,
-                'updated'  => null,
-            ])->values()->toArray();
-        }
+        // Set up 6 recommended courses for the carousel
+        $continueWatching = collect($allCourses)->take(6)->map(fn($c) => [
+            'slug'     => $c['slug'],
+            'title'    => $c['title'],
+            'category' => $c['category'],
+            'icon'     => $c['icon'],
+            'color'    => $c['color'],
+        ])->values()->toArray();
 
         // ── Recent lessons (last 5 progress updates) ────────────────────────────
         $recentProgress = \App\Models\UserLessonProgress::where(function ($q) use ($userId, $sessionId) {

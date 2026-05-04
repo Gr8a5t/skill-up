@@ -184,7 +184,7 @@
                 <div class="action-row">
                     <button class="icon-btn"><ion-icon name="bookmark-outline"></ion-icon></button>
                     <button class="share-btn"><ion-icon name="share-social-outline"></ion-icon> Share</button>
-                    <img src="https://i.pravatar.cc/150?u=instructor" style="width: 44px; height: 44px; border-radius: 10px; margin-left: 10px;" alt="Instructor">
+                    <img src="{{ asset('fitlife-assets/images/ai-icon.png') }}" style="width: 44px; height: 44px; border-radius: 10px; margin-left: 10px;" alt="Instructor">
                 </div>
             </header>
 
@@ -284,39 +284,7 @@
 
                 <!-- COMMENTS TAB -->
                 <div id="tab-comments" class="tab-pane">
-                    <section class="content-section">
-                        <h2 class="section-label">Discussion (2)</h2>
-                        
-                        <div class="comment-input-area">
-                            <img src="https://i.pravatar.cc/150?u=current_user" class="comment-avatar" alt="You">
-                            <input type="text" placeholder="Ask a question or share a thought...">
-                            <button>Post</button>
-                        </div>
-
-                        <div class="comment-box">
-                            <img src="https://i.pravatar.cc/150?u=user1" class="comment-avatar" alt="User">
-                            <div class="comment-content">
-                                <h5>Sarah Jenkins <span>• 2 days ago</span></h5>
-                                <p>This explanation finally made it click for me! I was struggling with this concept for weeks. Thank you!</p>
-                                <div class="comment-actions">
-                                    <button><ion-icon name="thumbs-up-outline"></ion-icon> 12</button>
-                                    <button>Reply</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="comment-box">
-                            <img src="https://i.pravatar.cc/150?u=user2" class="comment-avatar" alt="User">
-                            <div class="comment-content">
-                                <h5>Michael Chen <span>• 5 days ago</span></h5>
-                                <p>Is there a specific reason why we don't use the alternative method shown in the documentation?</p>
-                                <div class="comment-actions">
-                                    <button><ion-icon name="thumbs-up-outline"></ion-icon> 4</button>
-                                    <button>Reply</button>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
+                    @livewire('course-comments', ['courseSlug' => $slug])
                 </div>
             </div>
         </div>

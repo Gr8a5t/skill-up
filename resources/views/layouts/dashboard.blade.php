@@ -118,6 +118,7 @@
             .sidebar { position: fixed; left: 0; top: 0; height: 100vh; }
         }
     </style>
+    @livewireStyles
     @stack('styles')
 </head>
 <body>
@@ -159,6 +160,7 @@
         if (mobileMoreBtn) mobileMoreBtn.addEventListener('click', openSidebar);
         if (overlay) overlay.addEventListener('click', closeSidebar);
     </script>
+    @livewireScripts
     @stack('scripts')
 </body>
 </html>

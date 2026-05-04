@@ -32,9 +32,10 @@
         .s-nav-btn { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--border-color); background: var(--bg-surface); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-main); }
         .s-nav-btn.active { background: var(--brand-primary); color: #fff; border-color: var(--brand-primary); }
         
-        /* Continue Watching */
-        .cw-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
-        .cw-card { background: var(--bg-surface); border-radius: 12px; overflow: hidden; border: 1px solid var(--border-color); }
+        /* Recommended Courses Carousel */
+        .cw-grid { display: flex; gap: 20px; margin-bottom: 30px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 15px; scrollbar-width: none; }
+        .cw-grid::-webkit-scrollbar { display: none; }
+        .cw-card { flex: 0 0 calc(33.333% - 14px); scroll-snap-align: start; background: var(--bg-surface); border-radius: 12px; overflow: hidden; border: 1px solid var(--border-color); }
         .cw-img { width: 100%; height: 140px; background-color: #ddd; background-size: cover; background-position: center; position: relative; }
         .cw-like { position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; border-radius: 50%; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.4rem; }
         .cw-body { padding: 16px; }
@@ -59,18 +60,7 @@
         .action-arrow { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: var(--text-mut); text-decoration: none; transition: 0.2s; }
         .action-arrow:hover { border-color: var(--brand-primary); color: var(--brand-primary); }
 
-        /* Recent Chats Widget */
-        .chat-widget { background: var(--bg-surface); border-radius: 12px; border: 1px solid var(--border-color); overflow: hidden; margin-bottom: 30px; }
-        .chat-widget-list { display: flex; flex-direction: column; }
-        .cw-item { display: flex; padding: 12px 20px; gap: 12px; border-bottom: 1px solid #f2f2f2; text-decoration: none; color: inherit; align-items: center; }
-        .cw-item:last-child { border-bottom: none; }
-        .cw-item:hover { background: #fafafa; }
-        .cw-avatar { width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0; overflow: hidden; border: 1px solid #eee; }
-        .cw-avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .cw-info { flex-grow: 1; min-width: 0; }
-        .cw-name { font-size: 1.3rem; font-weight: 600; color: #000; margin-bottom: 2px; }
-        .cw-text { font-size: 1.2rem; color: var(--text-mut); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .cw-unread { width: 8px; height: 8px; border-radius: 50%; background: var(--brand-primary); }
+
 
         /* Right Panel */
         .right-panel { display: flex; flex-direction: column; gap: 30px; }
@@ -120,13 +110,15 @@
             .right-panel > div { flex: 1; }
         }
         @media (max-width: 992px) {
-            .cw-grid, .metric-row { grid-template-columns: repeat(2, 1fr); }
+            .metric-row { grid-template-columns: repeat(2, 1fr); }
+            .cw-card { flex: 0 0 calc(50% - 10px); }
             .hero-title { font-size: 2.2rem; max-width: 100%; }
             .content-area { padding: 20px; }
             .right-panel { flex-direction: column; width: 100%; }
         }
         @media (max-width: 768px) {
-            .cw-grid, .metric-row { grid-template-columns: 1fr; }
+            .metric-row { grid-template-columns: 1fr; }
+            .cw-card { flex: 0 0 calc(100% - 20px); }
             .hero-banner { padding: 30px 20px; margin-bottom: 20px; width: 100%; box-sizing: border-box; }
             .hero-title { font-size: 1.8rem; max-width: 100%; margin-bottom: 15px; }
             .hero-btn { font-size: 1.2rem; padding: 10px 20px; }
@@ -196,61 +188,29 @@
         </div>
 
         <div class="section-hdr">
-            <h2 class="section-title">Continue Watching</h2>
+            <h2 class="section-title">Recommended Courses</h2>
             <div class="section-nav">
-                <button class="s-nav-btn"><ion-icon name="chevron-back-outline"></ion-icon></button>
-                <button class="s-nav-btn active"><ion-icon name="chevron-forward-outline"></ion-icon></button>
+                <button class="s-nav-btn" id="crs-btn-prev" onclick="document.getElementById('crs-carousel').scrollBy({left: -300, behavior: 'smooth'})"><ion-icon name="chevron-back-outline"></ion-icon></button>
+                <button class="s-nav-btn active" id="crs-btn-next" onclick="document.getElementById('crs-carousel').scrollBy({left: 300, behavior: 'smooth'})"><ion-icon name="chevron-forward-outline"></ion-icon></button>
             </div>
         </div>
         
-        <div class="cw-grid">
+        <div class="cw-grid" id="crs-carousel">
             @forelse($continueWatching as $cw)
             <a href="{{ route('courses.learn', $cw['slug']) }}" class="cw-card" style="text-decoration:none; color:inherit;">
                 <div class="cw-img" style="background-color: {{ $cw['color'] }}; display:flex; align-items:center; justify-content:center;">
                     <ion-icon name="{{ $cw['icon'] }}" style="font-size: 5rem; color: rgba(0,0,0,0.6);"></ion-icon>
                 </div>
                 <div class="cw-body">
-                    <span class="cw-badge cw-badge-fe">{{ $cw['category'] }}</span>
-                    <h3 class="cw-title">{{ \Str::limit($cw['title'], 48) }}</h3>
-                    <div class="cw-mentor">
-                        <div style="flex:1;">
-                            <div style="background:#f0f0f0; border-radius:4px; height:5px; overflow:hidden;">
-                                <div style="width:{{ $cw['progress'] }}%; background:var(--brand-primary); height:100%; border-radius:4px;"></div>
-                            </div>
-                        </div>
-                        <span class="cw-mentor-name" style="margin-left:10px;">{{ $cw['progress'] }}%</span>
-                    </div>
+                    <span class="cw-badge cw-badge-fe" style="margin-bottom: 14px;">{{ $cw['category'] }}</span>
+                    <h3 class="cw-title" style="margin-bottom: 4px;">{{ \Str::limit($cw['title'], 48) }}</h3>
                 </div>
             </a>
             @empty
-            <p style="color:var(--text-mut); font-size:1.3rem;">No courses started yet. <a href="{{ route('courses') }}">Browse courses →</a></p>
+            <p style="color:var(--text-mut); font-size:1.3rem;">No courses available. <a href="{{ route('courses') }}">Browse courses →</a></p>
             @endforelse
         </div>
 
-        <div class="section-hdr" style="margin-top: 40px;">
-            <h2 class="section-title">Recent Chats</h2>
-            <a href="{{ route('dashboard.chats') }}" style="color:var(--brand-primary); font-weight:700; font-size:1.3rem; text-decoration:none;">Open App</a>
-        </div>
-
-        <div class="chat-widget">
-            <div class="chat-widget-list">
-                @foreach($conversations as $chat)
-                <a href="{{ route('dashboard.chats') }}" class="cw-item">
-                    <div class="cw-avatar">
-                        <img src="{{ $chat['avatar'] }}" alt="{{ $chat['name'] }}">
-                    </div>
-                    <div class="cw-info">
-                        <div class="cw-name">{{ $chat['name'] }}</div>
-                        <div class="cw-text">{{ $chat['message'] }}</div>
-                    </div>
-                    <div style="font-size: 1.1rem; color: var(--text-mut); margin-left: 10px;">{{ $chat['time'] }}</div>
-                    @if($chat['unread'])
-                    <div class="cw-unread" style="margin-left: 10px;"></div>
-                    @endif
-                </a>
-                @endforeach
-            </div>
-        </div>
 
         <div class="section-hdr" style="margin-top: 40px;">
             <h2 class="section-title">Your Lesson</h2>
@@ -372,7 +332,7 @@
 
         <div class="mentor-widget">
             <div class="section-hdr">
-                <h2 class="section-title">Your mentor</h2>
+                <h2 class="section-title">Close Friends</h2>
                 <button class="s-nav-btn" style="border:none; color:var(--text-mut);"><ion-icon name="add-outline"></ion-icon></button>
             </div>
             
@@ -436,6 +396,35 @@
     const streakEl = document.getElementById('heatmap-streak');
     if (streakEl && streak > 0) {
         streakEl.textContent = '🔥 ' + streak + ' day streak';
+    }
+
+    // Carousel buttons responsiveness
+    const carousel = document.getElementById('crs-carousel');
+    const btnPrev = document.getElementById('crs-btn-prev');
+    const btnNext = document.getElementById('crs-btn-next');
+
+    if (carousel && btnPrev && btnNext) {
+        const updateButtons = () => {
+            const minScrollLeft = 0;
+            const maxScrollLeft = carousel.scrollWidth - carousel.clientWidth;
+
+            if (carousel.scrollLeft <= minScrollLeft) {
+                btnPrev.classList.remove('active');
+            } else {
+                btnPrev.classList.add('active');
+            }
+
+            if (Math.ceil(carousel.scrollLeft) >= maxScrollLeft - 2) {
+                btnNext.classList.remove('active');
+            } else {
+                btnNext.classList.add('active');
+            }
+        };
+
+        // Initial check and event listeners
+        updateButtons();
+        carousel.addEventListener('scroll', updateButtons);
+        window.addEventListener('resize', updateButtons);
     }
 })();
 </script>
