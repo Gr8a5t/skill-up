@@ -993,96 +993,144 @@ class FitlifeController extends Controller
 
     public function dashboard()
     {
-        // Provide dummy lists to match the mockup
-        $continueWatching = [
-            [
-                'title' => 'Beginner\'s Guide to Becoming a Professional Front-End Developer',
-                'category' => 'FRONT END',
-                'mentor' => 'Leonardo samsul',
-                'image' => asset('fitlife-assets/images/blog-1.jpg')
-            ],
-            [
-                'title' => 'Optimizing User Experience with the Best UI/UX Design',
-                'category' => 'UI/UX DESIGN',
-                'mentor' => 'Bayu Salto',
-                'image' => asset('fitlife-assets/images/blog-2.jpg')
-            ],
-            [
-                'title' => 'Reviving and Refresh Company Image',
-                'category' => 'BRANDING',
-                'mentor' => 'Padhang Satrio',
-                'image' => asset('fitlife-assets/images/blog-3.jpg')
-            ],
-            [
-                'title' => 'Mastering App Marketing & Growth Hacking',
-                'category' => 'MARKETING',
-                'mentor' => 'Zakir Horizontal',
-                'image' => asset('fitlife-assets/images/blog-4.jpg')
-            ],
-        ];
-
-        $lessons = [
-            [
-                'mentor' => 'Padhang Satrio',
-                'date' => '2/16/2004',
-                'type' => 'UI/UX DESIGN',
-                'desc' => 'Understand Of UI/UX Design'
-            ],
-            [
-                'mentor' => 'Leonardo samsul',
-                'date' => '3/10/2004',
-                'type' => 'FRONT END',
-                'desc' => 'Structure with HTML5'
-            ],
-            [
-                'mentor' => 'Bayu Salto',
-                'date' => '4/05/2004',
-                'type' => 'BRANDING',
-                'desc' => 'Brand Identity Assets'
-            ],
-        ];
-
-        $mentors = [
-            ['name' => 'Padhang Satrio', 'role' => 'Mentor', 'avatar' => 'PS'],
-            ['name' => 'Zakir Horizontal', 'role' => 'Mentor', 'avatar' => 'ZH'],
-            ['name' => 'Leonardo samsul', 'role' => 'Mentor', 'avatar' => 'LS'],
-        ];
-
-        $conversations = [
-            [
-                'name' => 'Ankit Chaudhary',
-                'time' => '1h',
-                'message' => 'your channel will be rock crazy if you can implement th...',
-                'avatar' => 'https://i.pravatar.cc/150?u=ankit',
-                'unread' => false,
-            ],
-            [
-                'name' => 'Linden Clarkson (1)',
-                'time' => '5h',
-                'message' => 'Hey Lux, welcome to Amplify Views! To get the most ou...',
-                'avatar' => 'https://i.pravatar.cc/150?u=linden',
-                'unread' => true,
-            ],
-            [
-                'name' => 'Owen Popelycher',
-                'time' => '8h',
-                'message' => 'Hey Lux?',
-                'avatar' => 'https://i.pravatar.cc/150?u=owen',
-                'unread' => false,
-            ],
-            [
-                'name' => 'Erin Pope',
-                'time' => '15h',
-                'message' => 'Hey Lux, welcome to the Content Academy! I work with ...',
-                'avatar' => 'https://i.pravatar.cc/150?u=erin',
-                'unread' => false,
-            ],
-        ];
-
-        // Activity heatmap — count progress updates per day over the last 365 days
         $userId    = auth()->id();
         $sessionId = session()->getId();
+        $user      = auth()->user();
 
+        $allCourses = $this->getWebDevCourses();
+
+        // ── In-progress courses (has at least one progress record) ──────────────
+        $progressedSlugs = \App\Models\UserLessonProgress::where(function ($q) use ($userId, $sessionId) {
+                if ($userId) $q->where('user_id', $userId);
+                else         $q->where('session_id', $sessionId);
+            })
+            ->select('course_slug')
+            ->distinct()
+            ->pluck('course_slug')
+            ->toArray();
+
+        // Map progress slugs to course data + compute % per course
+        $continueWatching = [];
+        foreach ($progressedSlugs as $slug) {
+            $courseData = collect($allCourses)->firstWhere('slug', $slug);
+            if (!$courseData) continue;
+
+            // Average progress across all videos in this course
+            $records = \App\Models\UserLessonProgress::where('course_slug', $slug)
+                ->where(function ($q) use ($userId, $sessionId) {
+                    if ($userId) $q->where('user_id', $userId);
+                    else         $q->where('session_id', $sessionId);
+                })
+                ->get();
+
+            $avgPct = 0;
+            if ($records->count() > 0) {
+                $avgPct = $records->avg(function ($r) {
+                    return $r->total_seconds > 0
+                        ? min(100, round(($r->progress_seconds / $r->total_seconds) * 100))
+                        : 0;
+                });
+            }
+
+            $continueWatching[] = [
+                'slug'     => $slug,
+                'title'    => $courseData['title'],
+                'category' => $courseData['category'],
+                'icon'     => $courseData['icon'],
+                'color'    => $courseData['color'],
+                'progress' => round($avgPct),
+                'updated'  => $records->max('updated_at'),
+            ];
+        }
+
+        // If no courses started yet, show first 3 as suggestions
+        if (empty($continueWatching)) {
+            $continueWatching = collect($allCourses)->take(3)->map(fn($c) => [
+                'slug'     => $c['slug'],
+                'title'    => $c['title'],
+                'category' => $c['category'],
+                'icon'     => $c['icon'],
+                'color'    => $c['color'],
+                'progress' => 0,
+                'updated'  => null,
+            ])->values()->toArray();
+        }
+
+        // ── Recent lessons (last 5 progress updates) ────────────────────────────
+        $recentProgress = \App\Models\UserLessonProgress::where(function ($q) use ($userId, $sessionId) {
+                if ($userId) $q->where('user_id', $userId);
+                else         $q->where('session_id', $sessionId);
+            })
+            ->orderByDesc('updated_at')
+            ->take(5)
+            ->get();
+
+        $lessons = $recentProgress->map(function ($rec) use ($allCourses) {
+            $courseData = collect($allCourses)->firstWhere('slug', $rec->course_slug);
+            $pct = $rec->total_seconds > 0
+                ? min(100, round(($rec->progress_seconds / $rec->total_seconds) * 100))
+                : 0;
+            return [
+                'course_slug' => $rec->course_slug,
+                'video_id'    => $rec->video_id,
+                'category'    => $courseData['category'] ?? 'Course',
+                'title'       => $courseData['title'] ?? $rec->course_slug,
+                'progress'    => $pct,
+                'updated'     => $rec->updated_at,
+            ];
+        })->toArray();
+
+        // ── Overall stats ────────────────────────────────────────────────────────
+        $totalVideosStarted = \App\Models\UserLessonProgress::where(function ($q) use ($userId, $sessionId) {
+                if ($userId) $q->where('user_id', $userId);
+                else         $q->where('session_id', $sessionId);
+            })->count();
+
+        $completedVideos = \App\Models\UserLessonProgress::where(function ($q) use ($userId, $sessionId) {
+                if ($userId) $q->where('user_id', $userId);
+                else         $q->where('session_id', $sessionId);
+            })->where('is_completed', true)->count();
+
+        $overallPct = $totalVideosStarted > 0
+            ? round(($completedVideos / $totalVideosStarted) * 100)
+            : 0;
+
+        $stats = [
+            'courses_started'  => count($progressedSlugs),
+            'videos_completed' => $completedVideos,
+            'overall_pct'      => $overallPct,
+        ];
+
+        // ── Conversations (real from DB if chat messages table exists) ───────────
+        $conversations = [];
+        try {
+            $conversations = DB::table('chat_messages')
+                ->where(function ($q) use ($userId, $sessionId) {
+                    if ($userId) $q->where('user_id', $userId)->orWhere('recipient_id', $userId);
+                    else         $q->where('session_id', $sessionId);
+                })
+                ->orderByDesc('created_at')
+                ->take(4)
+                ->get()
+                ->map(fn($m) => [
+                    'name'    => $m->sender_name ?? 'Student',
+                    'time'    => \Carbon\Carbon::parse($m->created_at)->diffForHumans(),
+                    'message' => \Str::limit($m->message ?? '', 50),
+                    'avatar'  => 'https://i.pravatar.cc/150?u=' . ($m->user_id ?? $m->session_id),
+                    'unread'  => false,
+                ])->toArray();
+        } catch (\Exception $e) {
+            // Table may not exist yet
+        }
+
+        // Fallback conversations if none exist
+        if (empty($conversations)) {
+            $conversations = [
+                ['name' => 'SkillUp Team', 'time' => 'Just now', 'message' => 'Welcome to SkillUp! Start your first course today.', 'avatar' => 'https://i.pravatar.cc/150?u=skillup', 'unread' => true],
+            ];
+        }
+
+        // ── Activity heatmap ─────────────────────────────────────────────────────
         $activityRaw = \App\Models\UserLessonProgress::where(function ($q) use ($userId, $sessionId) {
                 if ($userId) $q->where('user_id', $userId);
                 else         $q->where('session_id', $sessionId);
@@ -1093,14 +1141,23 @@ class FitlifeController extends Controller
             ->pluck('count', 'day')
             ->toArray();
 
-        // Build a full 365-day map (today → 364 days ago) keyed by Y-m-d
         $activityMap = [];
         for ($i = 364; $i >= 0; $i--) {
             $date = now()->subDays($i)->format('Y-m-d');
             $activityMap[$date] = $activityRaw[$date] ?? 0;
         }
 
-        return view('fitlife.user-dashboard', compact('continueWatching', 'lessons', 'mentors', 'conversations', 'activityMap'));
+        // ── Dummy mentors (no mentor system yet) ─────────────────────────────────
+        $mentors = [
+            ['name' => 'Padhang Satrio',   'role' => 'Mentor', 'avatar' => 'PS'],
+            ['name' => 'Zakir Horizontal', 'role' => 'Mentor', 'avatar' => 'ZH'],
+            ['name' => 'Leonardo samsul',  'role' => 'Mentor', 'avatar' => 'LS'],
+        ];
+
+        return view('fitlife.user-dashboard', compact(
+            'continueWatching', 'lessons', 'mentors',
+            'conversations', 'activityMap', 'stats'
+        ));
     }
 
     public function chats()

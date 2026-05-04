@@ -173,24 +173,24 @@
 
         <div class="metric-row">
             <div class="metric-card">
-                <div class="m-icon m-icon-1"><ion-icon name="cube-outline"></ion-icon></div>
+                <div class="m-icon m-icon-1"><ion-icon name="albums-outline"></ion-icon></div>
                 <div class="m-details">
-                    <p>2/8 watched</p>
-                    <h4>UI/UX Design</h4>
+                    <p>Courses In Progress</p>
+                    <h4>{{ $stats['courses_started'] }}</h4>
                 </div>
             </div>
             <div class="metric-card">
-                <div class="m-icon m-icon-2"><ion-icon name="color-palette-outline"></ion-icon></div>
+                <div class="m-icon m-icon-2"><ion-icon name="checkmark-done-circle-outline"></ion-icon></div>
                 <div class="m-details">
-                    <p>3/8 watched</p>
-                    <h4>Branding</h4>
+                    <p>Videos Completed</p>
+                    <h4>{{ $stats['videos_completed'] }}</h4>
                 </div>
             </div>
             <div class="metric-card">
-                <div class="m-icon m-icon-3"><ion-icon name="desktop-outline"></ion-icon></div>
+                <div class="m-icon m-icon-3"><ion-icon name="trending-up-outline"></ion-icon></div>
                 <div class="m-details">
-                    <p>6/12 watched</p>
-                    <h4>Front End</h4>
+                    <p>Overall Progress</p>
+                    <h4>{{ $stats['overall_pct'] }}%</h4>
                 </div>
             </div>
         </div>
@@ -204,28 +204,27 @@
         </div>
         
         <div class="cw-grid">
-            @foreach($continueWatching as $index => $cw)
-            <div class="cw-card">
-                <div class="cw-img" style="background-image: url('{{ $cw['image'] }}');">
-                    <div class="cw-like"><ion-icon name="heart-outline"></ion-icon></div>
+            @forelse($continueWatching as $cw)
+            <a href="{{ route('courses.learn', $cw['slug']) }}" class="cw-card" style="text-decoration:none; color:inherit;">
+                <div class="cw-img" style="background-color: {{ $cw['color'] }}; display:flex; align-items:center; justify-content:center;">
+                    <ion-icon name="{{ $cw['icon'] }}" style="font-size: 5rem; color: rgba(0,0,0,0.6);"></ion-icon>
                 </div>
                 <div class="cw-body">
-                    @php
-                        $badgeClass = match($cw['category']) {
-                            'UI/UX DESIGN' => 'cw-badge-ux',
-                            'BRANDING' => 'cw-badge-br',
-                            default => 'cw-badge-fe'
-                        };
-                    @endphp
-                    <span class="cw-badge {{ $badgeClass }}">{{ \Str::title(strtolower($cw['category'])) }}</span>
+                    <span class="cw-badge cw-badge-fe">{{ $cw['category'] }}</span>
                     <h3 class="cw-title">{{ \Str::limit($cw['title'], 48) }}</h3>
                     <div class="cw-mentor">
-                        <div class="cw-mentor-ava">{{ strtoupper(substr($cw['mentor'], 0, 1)) }}</div>
-                        <span class="cw-mentor-name">{{ $cw['mentor'] }}<br><span style="font-weight:400;">Mentor</span></span>
+                        <div style="flex:1;">
+                            <div style="background:#f0f0f0; border-radius:4px; height:5px; overflow:hidden;">
+                                <div style="width:{{ $cw['progress'] }}%; background:var(--brand-primary); height:100%; border-radius:4px;"></div>
+                            </div>
+                        </div>
+                        <span class="cw-mentor-name" style="margin-left:10px;">{{ $cw['progress'] }}%</span>
                     </div>
                 </div>
-            </div>
-            @endforeach
+            </a>
+            @empty
+            <p style="color:var(--text-mut); font-size:1.3rem;">No courses started yet. <a href="{{ route('courses') }}">Browse courses →</a></p>
+            @endforelse
         </div>
 
         <div class="section-hdr" style="margin-top: 40px;">
@@ -261,33 +260,35 @@
         <table class="lesson-table">
             <thead>
                 <tr>
-                    <th>Mentor</th>
-                    <th>Type</th>
-                    <th>Desc</th>
+                    <th>Course</th>
+                    <th>Category</th>
+                    <th>Progress</th>
                     <th>Action</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($lessons as $lesson)
+                @forelse($lessons as $lesson)
                 <tr>
-                    <td data-label="Mentor">
+                    <td data-label="Course">
                         <div class="tbl-mentor">
-                            <div class="cw-mentor-ava" style="width:36px; height:36px; font-size:1.2rem;">{{ strtoupper(substr($lesson['mentor'], 0, 1)) }}</div>
+                            <div class="cw-mentor-ava" style="width:36px; height:36px; font-size:1.2rem;">{{ strtoupper(substr($lesson['category'], 0, 1)) }}</div>
                             <div class="tbl-m-info">
-                                <h5>{{ $lesson['mentor'] }}</h5>
-                                <p>{{ $lesson['date'] }}</p>
+                                <h5>{{ \Str::limit($lesson['title'], 30) }}</h5>
+                                <p>{{ $lesson['updated'] ? \Carbon\Carbon::parse($lesson['updated'])->diffForHumans() : '' }}</p>
                             </div>
                         </div>
                     </td>
-                    <td data-label="Type">
-                        <span class="tbl-badge"><ion-icon name="color-filter-outline"></ion-icon> {{ \Str::title(strtolower($lesson['type'])) }}</span>
+                    <td data-label="Category">
+                        <span class="tbl-badge"><ion-icon name="color-filter-outline"></ion-icon> {{ $lesson['category'] }}</span>
                     </td>
-                    <td data-label="Description" style="font-weight: 500; color: var(--text-main);">{{ $lesson['desc'] }}</td>
+                    <td data-label="Progress" style="font-weight: 700; color: var(--brand-primary);">{{ $lesson['progress'] }}%</td>
                     <td data-label="Action">
-                        <a href="#" class="action-arrow"><ion-icon name="arrow-forward-outline"></ion-icon></a>
+                        <a href="{{ route('courses.learn', $lesson['course_slug']) }}?v={{ $lesson['video_id'] }}" class="action-arrow"><ion-icon name="arrow-forward-outline"></ion-icon></a>
                     </td>
                 </tr>
-                @endforeach
+                @empty
+                <tr><td colspan="4" style="text-align:center; color:var(--text-mut); padding:30px;">No lessons started yet. <a href="{{ route('courses') }}">Start your first course →</a></td></tr>
+                @endforelse
             </tbody>
         </table>
     </div>
@@ -300,11 +301,11 @@
                 <ion-icon name="ellipsis-vertical" style="color:var(--text-mut); font-size:1.8rem;"></ion-icon>
             </div>
             
-            <div class="stat-radial">
+            <div class="stat-radial" style="background: conic-gradient(var(--brand-primary) {{ $stats['overall_pct'] }}%, #f0f0f0 0);">
                 <div class="stat-inner">
                     <img src="https://ui-avatars.com/api/?name={{ rawurlencode(auth()->user()->name) }}&background=f0ebff&color=8e54e9&rounded=true&size=100" alt="Avatar" style="width: 100%; height: 100%;">
                 </div>
-                <div class="stat-val">32%</div>
+                <div class="stat-val">{{ $stats['overall_pct'] }}%</div>
             </div>
             
             <div class="stat-greeting">Good Morning {{ explode(' ', auth()->user()->name)[0] }} 🔥</div>
