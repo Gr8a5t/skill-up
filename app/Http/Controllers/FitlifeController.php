@@ -149,10 +149,10 @@ class FitlifeController extends Controller
 
         if (empty($youtubeKey)) {
             $apiError = 'YOUTUBE_API_KEY is not configured on this server.';
-            \Illuminate\Support\Facades\Log::error('[CourseLearn] ' . $apiError);
+            Log::error('[CourseLearn] ' . $apiError);
         } else {
             try {
-                $response = \Illuminate\Support\Facades\Http::timeout(8)->get('https://www.googleapis.com/youtube/v3/playlistItems', [
+                $response = Http::timeout(8)->get('https://www.googleapis.com/youtube/v3/playlistItems', [
                     'part'       => 'snippet',
                     'playlistId' => $playlistId,
                     'maxResults' => 20,
@@ -163,13 +163,13 @@ class FitlifeController extends Controller
 
                 if (isset($json['error'])) {
                     $apiError = $json['error']['message'] ?? 'Unknown YouTube API error';
-                    \Illuminate\Support\Facades\Log::error('[CourseLearn] YouTube API error: ' . $apiError);
+                    Log::error('[CourseLearn] YouTube API error: ' . $apiError);
                 } else {
                     $items = $json['items'] ?? [];
                 }
             } catch (\Exception $e) {
                 $apiError = $e->getMessage();
-                \Illuminate\Support\Facades\Log::error('[CourseLearn] HTTP exception: ' . $apiError);
+                Log::error('[CourseLearn] HTTP exception: ' . $apiError);
             }
         }
 
@@ -247,7 +247,7 @@ class FitlifeController extends Controller
         return view('fitlife.course-learn', compact('course', 'lessons', 'slug'));
     }
 
-    public function updateCourseProgress(\Illuminate\Http\Request $request)
+    public function updateCourseProgress(Request $request)
     {
         $request->validate([
             'course_slug' => 'required|string',
