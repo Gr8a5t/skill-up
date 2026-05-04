@@ -25,8 +25,30 @@
                         </svg>
                         {{ $comment->likes }}
                     </button>
-                    <button>Reply</button>
+                    <button wire:click="setReply({{ $comment->id }})">Reply</button>
                 </div>
+
+                @if($replyingTo === $comment->id)
+                <div class="reply-form" style="margin-top: 10px; display:flex; gap:10px;">
+                    <input type="text" wire:model="replyComment" placeholder="Write a reply..." style="flex:1; padding:8px 12px; border:1px solid #ddd; border-radius:6px; font-size:1.15rem; outline:none;">
+                    <button wire:click="submitReply" style="padding:6px 14px; background:var(--brand-primary); color:#fff; border:none; border-radius:6px; cursor:pointer; font-weight:600;">Post Reply</button>
+                    <button wire:click="cancelReply" style="padding:6px 14px; background:#f5f5f5; color:#555; border:none; border-radius:6px; cursor:pointer; font-weight:600;">Cancel</button>
+                </div>
+                @endif
+                
+                @if($comment->replies->count() > 0)
+                <div class="replies" style="margin-top: 16px; padding-left: 20px; border-left: 2px solid #eaeaea;">
+                    @foreach($comment->replies as $reply)
+                    <div class="comment-box" wire:key="reply-{{ $reply->id }}" style="margin-bottom: 12px; padding-bottom: 0; border: none; gap:10px;">
+                        <img src="{{ $reply->avatar }}" class="comment-avatar" alt="User" style="width:34px; height:34px;">
+                        <div class="comment-content" style="width: 100%;">
+                            <h5 style="font-size:1.15rem; margin-bottom:2px;">{{ $reply->user_name }} <span style="font-size:1rem;">• {{ $reply->created_at->diffForHumans() }}</span></h5>
+                            <p style="font-size:1.15rem; color:#555;">{{ $reply->content }}</p>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+                @endif
             </div>
         </div>
         @empty

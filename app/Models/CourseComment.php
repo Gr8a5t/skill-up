@@ -11,6 +11,7 @@ class CourseComment extends Model
         'user_name',
         'avatar',
         'content',
+        'parent_id',
         'likes',
         'liked_by',
     ];
@@ -18,4 +19,9 @@ class CourseComment extends Model
     protected $casts = [
         'liked_by' => 'array',
     ];
+
+    public function replies()
+    {
+        return $this->hasMany(CourseComment::class, 'parent_id')->orderBy('created_at', 'asc');
+    }
 }

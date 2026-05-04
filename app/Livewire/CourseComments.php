@@ -9,6 +9,8 @@ class CourseComments extends Component
 {
     public $courseSlug;
     public $newComment = '';
+    public $replyComment = '';
+    public $replyingTo = null;
 
     public function mount($courseSlug)
     {
@@ -31,6 +33,38 @@ class CourseComments extends Component
         ]);
 
         $this->newComment = '';
+    }
+
+    public function setReply($id)
+    {
+        $this->replyingTo = $id;
+        $this->replyComment = '';
+    }
+
+    public function cancelReply()
+    {
+        $this->replyingTo = null;
+        $this->replyComment = '';
+    }
+
+    public function submitReply()
+    {
+        $this->validate([
+            'replyComment' => 'required|string|max:1000',
+        ]);
+
+        CourseComment::create([
+            'course_slug' => $this->courseSlug,
+            'parent_id' => $this->replyingTo,
+            'user_name' => auth()->check() ? auth()->user()->name : 'Guest Student',
+            'avatar' => auth()->check() 
+                ? 'https://ui-avatars.com/api/?name='.urlencode(auth()->user()->name) 
+                : 'https://i.pravatar.cc/150?u=' . session()->getId(),
+            'content' => $this->replyComment,
+        ]);
+
+        $this->replyComment = '';
+        $this->replyingTo = null;
     }
 
     public function likeComment($id)
@@ -58,6 +92,8 @@ class CourseComments extends Component
     public function render()
     {
         $comments = CourseComment::where('course_slug', $this->courseSlug)
+            ->whereNull('parent_id')
+            ->with('replies')
             ->orderBy('created_at', 'desc')
             ->get();
 
