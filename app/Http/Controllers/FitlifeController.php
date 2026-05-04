@@ -144,14 +144,34 @@ class FitlifeController extends Controller
         
         $playlistId = $courseData['playlist_id'];
         
-        $response = \Illuminate\Support\Facades\Http::get('https://www.googleapis.com/youtube/v3/playlistItems', [
-            'part' => 'snippet',
-            'playlistId' => $playlistId,
-            'maxResults' => 20,
-            'key' => $youtubeKey,
-        ]);
+        $items = [];
+        $apiError = null;
 
-        $items = $response->json()['items'] ?? [];
+        if (empty($youtubeKey)) {
+            $apiError = 'YOUTUBE_API_KEY is not configured on this server.';
+            \Illuminate\Support\Facades\Log::error('[CourseLearn] ' . $apiError);
+        } else {
+            try {
+                $response = \Illuminate\Support\Facades\Http::timeout(8)->get('https://www.googleapis.com/youtube/v3/playlistItems', [
+                    'part'       => 'snippet',
+                    'playlistId' => $playlistId,
+                    'maxResults' => 20,
+                    'key'        => $youtubeKey,
+                ]);
+
+                $json = $response->json();
+
+                if (isset($json['error'])) {
+                    $apiError = $json['error']['message'] ?? 'Unknown YouTube API error';
+                    \Illuminate\Support\Facades\Log::error('[CourseLearn] YouTube API error: ' . $apiError);
+                } else {
+                    $items = $json['items'] ?? [];
+                }
+            } catch (\Exception $e) {
+                $apiError = $e->getMessage();
+                \Illuminate\Support\Facades\Log::error('[CourseLearn] HTTP exception: ' . $apiError);
+            }
+        }
 
         $course = [
             'title' => $courseData['title'],
@@ -205,11 +225,24 @@ class FitlifeController extends Controller
                 ];
             }
         } else {
-            // Fallback if API fails
-            $lessons = [
-                ['video_id' => 'SqcY0GlETPk', 'title' => 'API Failed or No Key', 'time' => '0:00', 'progress' => 0, 'active' => true],
+            // Fallback if API fails — use a sensible first video per course
+            $fallbackVideos = [
+                'html-basics'      => 'it1rTvBcfRg',
+                'css-styling'      => 'wRNinF7YQqQ',
+                'modern-javascript'=> 'W6NZfCO5SIk',
+                'php-fundamentals' => 'OK_JCtrrv-c',
+                'laravel-mastery'  => 'Rz6SMgKrSYE',
+                'react-beginners'  => 'SqcY0GlETPk',
+                'ai-agents-intro'  => 'VMj-3S1tku0',
             ];
+            $fallbackId = $fallbackVideos[$slug] ?? 'SqcY0GlETPk';
+            $lessons = [
+                ['video_id' => $fallbackId, 'title' => $courseData['title'] . ' — Intro', 'time' => 'Video', 'progress' => 0, 'active' => true],
+            ];
+            $course['video_id'] = $fallbackId;
+            $activeVideoId = $fallbackId;
         }
+
 
         return view('fitlife.course-learn', compact('course', 'lessons', 'slug'));
     }
