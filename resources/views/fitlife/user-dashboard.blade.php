@@ -121,25 +121,49 @@
         }
         @media (max-width: 992px) {
             .cw-grid, .metric-row { grid-template-columns: repeat(2, 1fr); }
-            .hero-title { font-size: 2.2rem; }
+            .hero-title { font-size: 2.2rem; max-width: 100%; }
             .content-area { padding: 20px; }
             .right-panel { flex-direction: column; width: 100%; }
         }
         @media (max-width: 768px) {
             .cw-grid, .metric-row { grid-template-columns: 1fr; }
-            .hero-banner { padding: 30px 24px; }
-            .hero-title { font-size: 1.8rem; }
+            .hero-banner { padding: 30px 20px; margin-bottom: 20px; width: 100%; box-sizing: border-box; }
+            .hero-title { font-size: 1.8rem; max-width: 100%; margin-bottom: 15px; }
+            .hero-btn { font-size: 1.2rem; padding: 10px 20px; }
+            
             .lesson-table thead { display: none; }
             .lesson-table, .lesson-table tbody, .lesson-table tr, .lesson-table td { display: block; width: 100%; }
-            .lesson-table tr { margin-bottom: 16px; border-bottom: 1px solid var(--border-color); }
-            .lesson-table td { border-bottom: none; display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; text-align: right; }
-            .lesson-table td::before { content: attr(data-label); font-weight: 700; color: var(--text-mut); text-transform: uppercase; font-size: 1rem; float: left; }
+            .lesson-table tr { margin-bottom: 16px; border-bottom: 1px solid var(--border-color); background: var(--bg-surface); border-radius: 12px; }
+            .lesson-table td { border-bottom: none; display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; text-align: right; }
+            .lesson-table td::before { content: attr(data-label); font-weight: 700; color: var(--text-mut); text-transform: uppercase; font-size: 0.9rem; float: left; text-align: left; margin-right: 10px; }
+            .tbl-mentor { justify-content: flex-end; width: 100%; }
+            
+            .content-area { padding: 15px; gap: 20px; }
+            .metric-card { padding: 12px 16px; gap: 12px; }
+            .m-icon { width: 40px; height: 40px; font-size: 1.8rem; }
+            .m-details h4 { font-size: 1.3rem; }
+            
+            .stat-widget, .mentor-widget { padding: 20px 15px; width: 100%; box-sizing: border-box; overflow: hidden; }
+            .heatmap-outer { width: 100%; max-width: 100%; overflow-x: auto; display: block; }
+            .hero-title { white-space: normal !important; word-break: break-word !important; }
+            
+            .cw-card { width: 100%; }
+        }
+        @media (max-width: 480px) {
+            .hero-title { font-size: 1.5rem !important; }
+            .section-title { font-size: 1.5rem; }
+            .cw-body { padding: 12px; }
+            .cw-title { font-size: 1.2rem; }
+            .topbar { height: 60px; padding: 0 12px; }
+            .user-name { display: none; }
+            .content-area { padding: 10px; }
+            .m-details h4 { font-size: 1.2rem; }
         }
     </style>
 @endpush
 
 @section('content')
-    <div class="left-panel">
+    <div class="left-panel" style="min-width: 0;">
         <div class="hero-banner">
             <div class="hero-stars"></div>
             <div class="hero-label">Online Course</div>
@@ -269,7 +293,7 @@
     </div>
     
     <!-- Right Column -->
-    <div class="right-panel">
+    <div class="right-panel" style="min-width: 0;">
         <div class="stat-widget">
             <div class="section-hdr" style="margin-bottom: 24px;">
                 <h2 class="section-title">Statistic</h2>

@@ -23,9 +23,10 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { overflow-x: hidden; width: 100%; position: relative; }
         body { font-family: 'Rubik', sans-serif; background-color: var(--bg-body); color: var(--text-main); line-height: 1.5; }
         
-        .layout-wrapper { display: flex; min-height: 100vh; }
+        .layout-wrapper { display: flex; min-height: 100vh; overflow-x: hidden; position: relative; }
         
         /* Sidebar */
         .sidebar { width: 260px; background: var(--bg-surface); border-right: 1px solid var(--border-color); flex-shrink: 0; display: flex; flex-direction: column; overflow-y: auto; padding-bottom: 24px; scrollbar-width: none; -ms-overflow-style: none; }
@@ -49,12 +50,12 @@
         .friend-info { display: flex; flex-direction: column; }
         .friend-name { font-size: 1.3rem; font-weight: 700; color: var(--text-main); }
         .friend-role { font-size: 1.1rem; color: var(--text-mut); }
-
+ 
         /* Main Content */
-        .main-col { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+        .main-col { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; position: relative; }
         
         /* Topbar */
-        .topbar { height: 80px; background: var(--bg-surface); padding: 0 40px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); }
+        .topbar { height: 80px; background: var(--bg-surface); padding: 0 40px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
         .search-bar { position: relative; width: 400px; }
         .search-bar ion-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 1.8rem; color: var(--text-mut); }
         .search-input { width: 100%; padding: 12px 16px 12px 45px; border-radius: 30px; border: 1px solid var(--border-color); background: #f6f7f8; font-family: inherit; font-size: 1.4rem; transition: 0.2s; }
@@ -63,8 +64,8 @@
         .icon-btn { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--border-color); background: #fff; color: var(--text-main); font-size: 1.8rem; cursor: pointer; transition: 0.2s; text-decoration: none; }
         .icon-btn:hover, .icon-btn.active { border-color: var(--brand-primary); color: var(--brand-primary); }
         .user-profile { display: flex; align-items: center; gap: 12px; }
-        .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--brand-primary); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.4rem; font-weight: 700; }
-        .user-name { font-size: 1.4rem; font-weight: 700; color: var(--text-main); }
+        .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--brand-primary); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.4rem; font-weight: 700; flex-shrink: 0; }
+        .user-name { font-size: 1.4rem; font-weight: 700; color: var(--text-main); white-space: nowrap; }
 
         /* Mobile Adjustments */
         .mobile-nav { display: none; }
@@ -83,7 +84,8 @@
                 position: fixed;
                 bottom: 0;
                 left: 0;
-                width: 100%;
+                width: 100vw;
+                max-width: 100%;
                 background: var(--bg-surface);
                 border-top: 1px solid var(--border-color);
                 z-index: 1001;
@@ -99,14 +101,16 @@
                 align-items: center;
                 color: var(--text-mut);
                 text-decoration: none;
-                font-size: 1.1rem;
+                font-size: 1rem;
                 font-weight: 700;
-                gap: 4px;
+                gap: 2px;
+                flex: 1;
+                min-width: 0;
             }
             .mobile-nav-link.active { color: var(--brand-primary); }
-            .mobile-nav-link ion-icon { font-size: 2.2rem; }
+            .mobile-nav-link ion-icon { font-size: 1.8rem; }
             
-            body { padding-bottom: 80px; }
+            body { padding-bottom: 70px; overflow-x: hidden; width: 100vw; }
         }
 
         @media (min-width: 993px) {
