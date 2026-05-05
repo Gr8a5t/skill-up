@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\FitlifeController;
-use App\Http\Controllers\NewsController;
+
 
 Route::get('/', [FitlifeController::class, 'index'])->name('home');
 Route::get('/about', [FitlifeController::class, 'about'])->name('about');
@@ -20,14 +20,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 Route::middleware('auth')->group(function () {
     Route::get('/user-dashboard', [FitlifeController::class, 'dashboard'])->name('dashboard');
     Route::get('/chats', [FitlifeController::class, 'chats'])->name('dashboard.chats');
-    // News Community Routes
-    Route::prefix('news')->name('news.')->group(function () {
-        Route::get('/', [NewsController::class, 'index'])->name('index');
-        Route::post('/', [NewsController::class, 'store'])->name('store');
-        Route::get('/{post}', [NewsController::class, 'show'])->name('show');
-        Route::post('/{post}/comment', [NewsController::class, 'comment'])->name('comment');
-        Route::post('/{post}/vote', [NewsController::class, 'vote'])->name('vote');
-    });
+
 
     Route::get('/paths', [FitlifeController::class, 'paths'])->name('paths');
     Route::get('/courses', [FitlifeController::class, 'courses'])->name('courses');
