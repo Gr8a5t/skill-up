@@ -8,6 +8,7 @@ class CourseComment extends Model
 {
     protected $fillable = [
         'course_slug',
+        'user_id',
         'user_name',
         'avatar',
         'content',
@@ -23,5 +24,10 @@ class CourseComment extends Model
     public function replies()
     {
         return $this->hasMany(CourseComment::class, 'parent_id')->orderBy('created_at', 'asc');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

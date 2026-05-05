@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -995,34 +996,36 @@ class FitlifeController extends Controller
     {
         $userId    = auth()->id();
         $sessionId = session()->getId();
-        $user      = auth()->user();
-
+        
         $allCourses = $this->getWebDevCourses();
+        
+        $progress = $this->getDashboardProgress($userId, $sessionId, $allCourses);
+        $stats    = $this->getDashboardStats($userId, $sessionId, $progress['slugs']);
+        
+        return view('fitlife.user-dashboard', [
+            'continueWatching' => $this->getDashboardRecommendations($allCourses),
+            'lessons'          => $progress['lessons'],
+            'mentors'          => $this->getDashboardMentors(),
+            'conversations'    => $this->getDashboardConversations($userId, $sessionId),
+            'activityMap'      => $this->getDashboardActivityMap($userId, $sessionId),
+            'stats'            => $stats,
+        ]);
+    }
 
-        // ── In-progress courses (has at least one progress record) ──────────────
-        $progressedSlugs = \App\Models\UserLessonProgress::where(function ($q) use ($userId, $sessionId) {
-                if ($userId) $q->where('user_id', $userId);
-                else         $q->where('session_id', $sessionId);
-            })
+    private function getDashboardProgress($userId, $sessionId, $allCourses)
+    {
+        $queryRef = function ($q) use ($userId, $sessionId) {
+            if ($userId) $q->where('user_id', $userId);
+            else         $q->where('session_id', $sessionId);
+        };
+
+        $progressedSlugs = \App\Models\UserLessonProgress::where($queryRef)
             ->select('course_slug')
             ->distinct()
             ->pluck('course_slug')
             ->toArray();
 
-        // Set up 6 recommended courses for the carousel
-        $continueWatching = collect($allCourses)->take(6)->map(fn($c) => [
-            'slug'     => $c['slug'],
-            'title'    => $c['title'],
-            'category' => $c['category'],
-            'icon'     => $c['icon'],
-            'color'    => $c['color'],
-        ])->values()->toArray();
-
-        // ── Recent lessons (last 5 progress updates) ────────────────────────────
-        $recentProgress = \App\Models\UserLessonProgress::where(function ($q) use ($userId, $sessionId) {
-                if ($userId) $q->where('user_id', $userId);
-                else         $q->where('session_id', $sessionId);
-            })
+        $recentProgress = \App\Models\UserLessonProgress::where($queryRef)
             ->orderByDesc('updated_at')
             ->take(5)
             ->get();
@@ -1042,28 +1045,41 @@ class FitlifeController extends Controller
             ];
         })->toArray();
 
-        // ── Overall stats ────────────────────────────────────────────────────────
-        $totalVideosStarted = \App\Models\UserLessonProgress::where(function ($q) use ($userId, $sessionId) {
-                if ($userId) $q->where('user_id', $userId);
-                else         $q->where('session_id', $sessionId);
-            })->count();
+        return ['slugs' => $progressedSlugs, 'lessons' => $lessons];
+    }
 
-        $completedVideos = \App\Models\UserLessonProgress::where(function ($q) use ($userId, $sessionId) {
-                if ($userId) $q->where('user_id', $userId);
-                else         $q->where('session_id', $sessionId);
-            })->where('is_completed', true)->count();
+    private function getDashboardStats($userId, $sessionId, $progressedSlugs)
+    {
+        $queryRef = function ($q) use ($userId, $sessionId) {
+            if ($userId) $q->where('user_id', $userId);
+            else         $q->where('session_id', $sessionId);
+        };
 
-        $overallPct = $totalVideosStarted > 0
-            ? round(($completedVideos / $totalVideosStarted) * 100)
-            : 0;
+        $totalVideosStarted = \App\Models\UserLessonProgress::where($queryRef)->count();
+        $completedVideos = \App\Models\UserLessonProgress::where($queryRef)->where('is_completed', true)->count();
 
-        $stats = [
+        $overallPct = $totalVideosStarted > 0 ? round(($completedVideos / $totalVideosStarted) * 100) : 0;
+
+        return [
             'courses_started'  => count($progressedSlugs),
             'videos_completed' => $completedVideos,
             'overall_pct'      => $overallPct,
         ];
+    }
 
-        // ── Conversations (real from DB if chat messages table exists) ───────────
+    private function getDashboardRecommendations($allCourses)
+    {
+        return collect($allCourses)->take(6)->map(fn($c) => [
+            'slug'     => $c['slug'],
+            'title'    => $c['title'],
+            'category' => $c['category'],
+            'icon'     => $c['icon'],
+            'color'    => $c['color'],
+        ])->values()->toArray();
+    }
+
+    private function getDashboardConversations($userId, $sessionId)
+    {
         $conversations = [];
         try {
             $conversations = DB::table('chat_messages')
@@ -1081,18 +1097,15 @@ class FitlifeController extends Controller
                     'avatar'  => 'https://i.pravatar.cc/150?u=' . ($m->user_id ?? $m->session_id),
                     'unread'  => false,
                 ])->toArray();
-        } catch (\Exception $e) {
-            // Table may not exist yet
-        }
+        } catch (\Exception $e) {}
 
-        // Fallback conversations if none exist
-        if (empty($conversations)) {
-            $conversations = [
-                ['name' => 'SkillUp Team', 'time' => 'Just now', 'message' => 'Welcome to SkillUp! Start your first course today.', 'avatar' => 'https://i.pravatar.cc/150?u=skillup', 'unread' => true],
-            ];
-        }
+        return empty($conversations) ? [
+            ['name' => 'SkillUp Team', 'time' => 'Just now', 'message' => 'Welcome to SkillUp! Start your first course today.', 'avatar' => 'https://i.pravatar.cc/150?u=skillup', 'unread' => true],
+        ] : $conversations;
+    }
 
-        // ── Activity heatmap ─────────────────────────────────────────────────────
+    private function getDashboardActivityMap($userId, $sessionId)
+    {
         $activityRaw = \App\Models\UserLessonProgress::where(function ($q) use ($userId, $sessionId) {
                 if ($userId) $q->where('user_id', $userId);
                 else         $q->where('session_id', $sessionId);
@@ -1108,24 +1121,23 @@ class FitlifeController extends Controller
             $date = now()->subDays($i)->format('Y-m-d');
             $activityMap[$date] = $activityRaw[$date] ?? 0;
         }
+        return $activityMap;
+    }
 
-        // ── Dummy mentors (no mentor system yet) ─────────────────────────────────
-        $mentors = [
+    private function getDashboardMentors()
+    {
+        return [
             ['name' => 'Padhang Satrio',   'role' => 'Mentor', 'avatar' => 'PS'],
             ['name' => 'Zakir Horizontal', 'role' => 'Mentor', 'avatar' => 'ZH'],
             ['name' => 'Leonardo samsul',  'role' => 'Mentor', 'avatar' => 'LS'],
         ];
-
-        return view('fitlife.user-dashboard', compact(
-            'continueWatching', 'lessons', 'mentors',
-            'conversations', 'activityMap', 'stats'
-        ));
     }
 
-    public function chats()
+    public function chats(Request $request)
     {
         $conversations = [
             [
+                'id' => 1,
                 'name' => 'Ankit Chaudhary',
                 'time' => '1h',
                 'message' => 'your channel will be rock crazy if you can implement th...',
@@ -1133,6 +1145,7 @@ class FitlifeController extends Controller
                 'unread' => false,
             ],
             [
+                'id' => 2,
                 'name' => 'Linden Clarkson (1)',
                 'time' => '5h',
                 'message' => 'Hey Lux, welcome to Amplify Views! To get the most ou...',
@@ -1140,32 +1153,42 @@ class FitlifeController extends Controller
                 'unread' => true,
             ],
             [
+                'id' => 3,
                 'name' => 'Owen Popelycher',
                 'time' => '8h',
                 'message' => 'Hey Lux?',
                 'avatar' => 'https://i.pravatar.cc/150?u=owen',
                 'unread' => false,
             ],
-            [
-                'name' => 'Erin Pope',
-                'time' => '15h',
-                'message' => 'Hey Lux, welcome to the Content Academy! I work with ...',
-                'avatar' => 'https://i.pravatar.cc/150?u=erin',
-                'unread' => false,
-            ],
-            [
-                'name' => 'Money Maxxing',
-                'time' => '16h',
-                'message' => 'Yoo Whatsup Lux, welcome! Go check this out now http...',
-                'avatar' => 'https://i.pravatar.cc/150?u=money',
-                'unread' => false,
-            ],
         ];
 
+        // Handle direct chat from profile
+        if ($request->has('user_id')) {
+            $user = User::find($request->user_id);
+            if ($user && $user->id !== auth()->id()) {
+                // Check if already in list (simple placeholder logic)
+                $exists = false;
+                foreach ($conversations as $c) {
+                    if ($c['name'] === $user->name) { $exists = true; break; }
+                }
+
+                if (!$exists) {
+                    array_unshift($conversations, [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'time' => 'now',
+                        'message' => 'Start a new conversation...',
+                        'avatar' => $user->avatar ?? 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&background=ff4500&color=fff',
+                        'unread' => false,
+                    ]);
+                }
+            }
+        }
+
         $activeMessages = [
-            ['sender' => 'Ankit Chaudhary', 'time' => '1:30 PM', 'text' => 'Hey! Have you seen the new design update?', 'is_me' => false],
+            ['sender' => $conversations[0]['name'], 'time' => '1:30 PM', 'text' => 'Hey! Have you seen the new design update?', 'is_me' => false],
             ['sender' => 'You', 'time' => '1:32 PM', 'text' => 'Not yet, just jumping in now.', 'is_me' => true],
-            ['sender' => 'Ankit Chaudhary', 'time' => '1:35 PM', 'text' => 'It looks great. Your channel will be rock crazy if you can implement this.', 'is_me' => false],
+            ['sender' => $conversations[0]['name'], 'time' => '1:35 PM', 'text' => 'It looks great. Your channel will be rock crazy if you can implement this.', 'is_me' => false],
         ];
 
         return view('fitlife.chats', compact('conversations', 'activeMessages'));

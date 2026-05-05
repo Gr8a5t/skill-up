@@ -33,7 +33,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="{{ route('news.index') }}" class="navbar-link {{ request()->routeIs('news.*') ? 'active' : '' }}" data-nav-link>Chats</a>
+                    <a href="{{ route('dashboard.chats') }}" class="navbar-link {{ request()->routeIs('dashboard.chats') ? 'active' : '' }}" data-nav-link>Chats</a>
                 </li>
                 {{-- <li>
                     <a href="#" class="navbar-link" data-nav-link>Courses</a>

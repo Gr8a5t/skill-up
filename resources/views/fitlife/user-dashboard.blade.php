@@ -261,12 +261,12 @@
                 <ion-icon name="ellipsis-vertical" style="color:var(--text-mut); font-size:1.8rem;"></ion-icon>
             </div>
             
-            <div class="stat-radial" style="background: conic-gradient(var(--brand-primary) {{ $stats['overall_pct'] }}%, #f0f0f0 0);">
+            <a href="{{ route('profile.show', auth()->id()) }}" class="stat-radial" style="display:flex; text-decoration:none; background: conic-gradient(var(--brand-primary) {{ $stats['overall_pct'] }}%, #f0f0f0 0);">
                 <div class="stat-inner">
-                    <img src="https://ui-avatars.com/api/?name={{ rawurlencode(auth()->user()->name) }}&background=f0ebff&color=8e54e9&rounded=true&size=100" alt="Avatar" style="width: 100%; height: 100%;">
+                    <img src="{{ auth()->user()->avatar ?? 'https://ui-avatars.com/api/?name='.rawurlencode(auth()->user()->name).'&background=f0ebff&color=8e54e9&rounded=true&size=100' }}" alt="Avatar" style="width: 100%; height: 100%; object-fit:cover;">
                 </div>
                 <div class="stat-val">{{ $stats['overall_pct'] }}%</div>
-            </div>
+            </a>
             
             <div class="stat-greeting">Good Morning {{ explode(' ', auth()->user()->name)[0] }} 🔥</div>
             <div class="stat-sub">Continue your learning to achieve your target!</div>

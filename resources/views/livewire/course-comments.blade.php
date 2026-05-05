@@ -3,7 +3,7 @@
         <h2 class="section-label">Discussion ({{ $comments->count() }})</h2>
         
         <form wire:submit="submitComment" class="comment-input-area">
-            <img src="{{ auth()->check() ? 'https://ui-avatars.com/api/?name='.urlencode(auth()->user()->name) : 'https://i.pravatar.cc/150?u=' . session()->getId() }}" class="comment-avatar" alt="You">
+            <img src="{{ auth()->user()->avatar ?? 'https://ui-avatars.com/api/?name='.urlencode(auth()->user()->name).'&background=f0ebff&color=8e54e9' }}" class="comment-avatar" alt="You">
             <input type="text" wire:model="newComment" placeholder="Ask a question or share a thought..." required style="flex:1;">
             <button type="submit">Post</button>
         </form>
@@ -12,8 +12,13 @@
         <div class="comment-box" wire:key="comment-{{ $comment->id }}">
             <img src="{{ $comment->avatar }}" class="comment-avatar" alt="User">
             <div class="comment-content" style="width: 100%;">
-                <h5>{{ $comment->user_name }} <span>• {{ $comment->created_at->diffForHumans() }}</span></h5>
-                <p>{{ $comment->content }}</p>
+                            @if($comment->user_id)
+                                <a href="{{ route('profile.show', $comment->user_id) }}" style="text-decoration:none; color:inherit;">{{ $comment->user_name }}</a>
+                            @else
+                                {{ $comment->user_name }}
+                            @endif
+                             <span style="font-size: 0.85rem; color: #999; margin-left: 5px;">• {{ $comment->created_at->diffForHumans() }}</span>
+                <p style="margin-top: 5px;">{{ $comment->content }}</p>
                 <div class="comment-actions">
                     @php
                         $userIdentifier = auth()->check() ? auth()->id() : session()->getId();
@@ -42,8 +47,13 @@
                     <div class="comment-box" wire:key="reply-{{ $reply->id }}" style="margin-bottom: 12px; padding-bottom: 0; border: none; gap:10px;">
                         <img src="{{ $reply->avatar }}" class="comment-avatar" alt="User" style="width:34px; height:34px;">
                         <div class="comment-content" style="width: 100%;">
-                            <h5 style="font-size:1.15rem; margin-bottom:2px;">{{ $reply->user_name }} <span style="font-size:1rem;">• {{ $reply->created_at->diffForHumans() }}</span></h5>
-                            <p style="font-size:1.15rem; color:#555;">{{ $reply->content }}</p>
+                            @if($reply->user_id)
+                                <a href="{{ route('profile.show', $reply->user_id) }}" style="text-decoration:none; color:inherit;">{{ $reply->user_name }}</a>
+                            @else
+                                {{ $reply->user_name }}
+                            @endif
+                             <span style="font-size:0.85rem; color: #999;">• {{ $reply->created_at->diffForHumans() }}</span>
+                            <p style="font-size:1.15rem; color:#555; margin-top: 2px;">{{ $reply->content }}</p>
                         </div>
                     </div>
                     @endforeach

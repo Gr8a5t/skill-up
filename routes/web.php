@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\FitlifeController;
-
+use App\Http\Controllers\ProfileController;
 
 Route::get('/', [FitlifeController::class, 'index'])->name('home');
 Route::get('/about', [FitlifeController::class, 'about'])->name('about');
@@ -20,7 +20,11 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 Route::middleware('auth')->group(function () {
     Route::get('/user-dashboard', [FitlifeController::class, 'dashboard'])->name('dashboard');
     Route::get('/chats', [FitlifeController::class, 'chats'])->name('dashboard.chats');
-
+    
+    // Profile Routing
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile/edit', [ProfileController::class, 'update'])->name('profile.update');
+    Route::get('/profile/{user}', [ProfileController::class, 'show'])->name('profile.show');
 
     Route::get('/paths', [FitlifeController::class, 'paths'])->name('paths');
     Route::get('/courses', [FitlifeController::class, 'courses'])->name('courses');

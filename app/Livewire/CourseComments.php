@@ -25,9 +25,10 @@ class CourseComments extends Component
 
         CourseComment::create([
             'course_slug' => $this->courseSlug,
+            'user_id' => auth()->check() ? auth()->id() : null,
             'user_name' => auth()->check() ? auth()->user()->name : 'Guest Student',
             'avatar' => auth()->check() 
-                ? 'https://ui-avatars.com/api/?name='.urlencode(auth()->user()->name) 
+                ? (auth()->user()->avatar ?? 'https://ui-avatars.com/api/?name='.urlencode(auth()->user()->name))
                 : 'https://i.pravatar.cc/150?u=' . session()->getId(),
             'content' => $this->newComment,
         ]);
@@ -56,9 +57,10 @@ class CourseComments extends Component
         CourseComment::create([
             'course_slug' => $this->courseSlug,
             'parent_id' => $this->replyingTo,
+            'user_id' => auth()->check() ? auth()->id() : null,
             'user_name' => auth()->check() ? auth()->user()->name : 'Guest Student',
             'avatar' => auth()->check() 
-                ? 'https://ui-avatars.com/api/?name='.urlencode(auth()->user()->name) 
+                ? (auth()->user()->avatar ?? 'https://ui-avatars.com/api/?name='.urlencode(auth()->user()->name))
                 : 'https://i.pravatar.cc/150?u=' . session()->getId(),
             'content' => $this->replyComment,
         ]);
