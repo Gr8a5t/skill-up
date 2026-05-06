@@ -11,9 +11,9 @@
         <ion-icon name="map-outline"></ion-icon>
         <span>Paths</span>
     </a>
-    <a href="{{ route('dashboard.chats') }}" class="mobile-nav-link {{ request()->routeIs('dashboard.chats') ? 'active' : '' }}">
-        <ion-icon name="chatbubbles-outline"></ion-icon>
-        <span>Chats</span>
+    <a href="{{ route('dashboard.forum') }}" class="mobile-nav-link {{ request()->routeIs('dashboard.forum') ? 'active' : '' }}">
+        <ion-icon name="people-outline"></ion-icon>
+        <span>Forum</span>
     </a>
     <a href="javascript:void(0)" class="mobile-nav-link" id="mobileMoreBtn">
         <ion-icon name="menu-outline"></ion-icon>

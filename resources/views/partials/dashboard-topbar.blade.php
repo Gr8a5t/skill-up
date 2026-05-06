@@ -1,8 +1,8 @@
 <header class="topbar">
-    <div class="search-bar">
+    <form action="{{ route('courses') }}" method="GET" class="search-bar">
         <ion-icon name="search-outline"></ion-icon>
-        <input type="text" class="search-input" placeholder="Search and learn....">
-    </div>
+        <input type="text" name="search" class="search-input" placeholder="Search and learn...." value="{{ request('search') }}">
+    </form>
     <div class="topbar-right">
         <a href="{{ route('dashboard.chats') }}" class="icon-btn {{ request()->routeIs('dashboard.chats') ? 'active' : '' }}"><ion-icon name="chatbubbles-outline"></ion-icon></a>
         <a href="#" class="icon-btn"><ion-icon name="notifications-outline"></ion-icon></a>

@@ -71,13 +71,19 @@
         .mobile-nav { display: none; }
 
         @media (max-width: 992px) {
-            .sidebar { position: fixed; left: -260px; height: 100vh; z-index: 1000; transition: 0.3s; box-shadow: 10px 0 30px rgba(0,0,0,0.1); }
+            .sidebar { position: fixed; left: -260px; height: 100vh; z-index: 1000; transition: 0.3s; box-shadow: 10px 0 30px rgba(0,0,0,0.1); padding-bottom: 120px; }
             .sidebar.open { left: 0; }
             .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 999; }
             .sidebar-overlay.active { display: block; }
             
-            .topbar { padding: 0 20px; }
-            .search-bar { display: none; }
+            .topbar { padding: 0 15px; }
+            .search-bar { width: auto; flex-grow: 1; margin-right: 15px; }
+            .search-input { padding: 10px 12px 10px 35px; font-size: 1.2rem; }
+            .search-bar ion-icon { left: 12px; font-size: 1.5rem; }
+            
+            .topbar-right { gap: 10px; }
+            .icon-btn { width: 35px; height: 35px; font-size: 1.6rem; }
+            .user-name { display: none; }
             
             .mobile-nav {
                 display: flex;
@@ -125,11 +131,15 @@
 
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-    <div class="layout-wrapper">
-        @include('partials.dashboard-sidebar')
+    <div class="layout-wrapper" style="{{ (isset($noSidebar) && $noSidebar) ? 'padding-left: 0;' : '' }}">
+        @if(!isset($noSidebar) || !$noSidebar)
+            @include('partials.dashboard-sidebar')
+        @endif
 
         <main class="main-col">
-            @include('partials.dashboard-topbar')
+            @if(!isset($noTopbar) || !$noTopbar)
+                @include('partials.dashboard-topbar')
+            @endif
             
             <div class="content-area">
                 @yield('content')
@@ -137,7 +147,9 @@
         </main>
     </div>
 
-    @include('partials.dashboard-mobile-nav')
+    @if(!isset($noSidebar) || !$noSidebar)
+        @include('partials.dashboard-mobile-nav')
+    @endif
 
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>

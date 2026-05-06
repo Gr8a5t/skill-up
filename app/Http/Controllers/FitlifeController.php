@@ -129,9 +129,20 @@ class FitlifeController extends Controller
         ];
     }
 
-    public function courses()
+    public function courses(Request $request)
     {
-        $courses = $this->getWebDevCourses();
+        $allCourses = $this->getWebDevCourses();
+        $search = $request->input('search');
+
+        if ($search) {
+            $courses = array_filter($allCourses, function ($course) use ($search) {
+                return str_contains(strtolower($course['title']), strtolower($search)) ||
+                       str_contains(strtolower($course['category']), strtolower($search)) ||
+                       str_contains(strtolower(implode(' ', $course['tags'])), strtolower($search));
+            });
+        } else {
+            $courses = $allCourses;
+        }
 
         return view('fitlife.courses', compact('courses'));
     }
@@ -317,7 +328,11 @@ class FitlifeController extends Controller
             }
         }
 
-        return view('fitlife.paths', compact('paths'));
+        return view('fitlife.paths', [
+            'paths' => $paths,
+            'noTopbar' => true,
+            'noSidebar' => true
+        ]);
     }
 
     public function learn(string $slug)
@@ -1192,5 +1207,10 @@ class FitlifeController extends Controller
         ];
 
         return view('fitlife.chats', compact('conversations', 'activeMessages'));
+    }
+
+    public function forum()
+    {
+        return view('fitlife.forum', ['noTopbar' => true, 'noSidebar' => true]);
     }
 }

@@ -70,7 +70,7 @@
 @section('content')
     <div class="page-header">
         <h1 class="page-title">
-            All Courses <span class="count-badge">28</span>
+            All Courses <span class="count-badge">{{ count($courses) }}</span>
         </h1>
         <div class="header-controls">
             <button class="ctrl-btn"><ion-icon name="options-outline"></ion-icon> Filter</button>
@@ -83,7 +83,7 @@
     </div>
 
     <div class="course-grid">
-        @foreach($courses as $course)
+        @forelse($courses as $course)
         <a href="{{ route('courses.learn', $course['slug']) }}" class="course-card" style="text-decoration: none;">
             <div class="card-hdr" style="background-color: {{ $course['color'] }};">
                 <ion-icon name="{{ $course['icon'] }}" class="card-icon"></ion-icon>
@@ -101,6 +101,14 @@
                 </div>
             </div>
         </a>
-        @endforeach
+        @empty
+        <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px;">
+            <h2 style="font-size: 2.2rem; color: #1c1c1c; margin-bottom: 10px; font-weight: 800;">No courses found</h2>
+            <p style="color: #666; font-size: 1.5rem; margin-bottom: 30px;">We couldn't find any courses matching "{{ request('search') }}".</p>
+            <a href="{{ route('courses') }}" style="display: inline-flex; align-items: center; gap: 8px; color: var(--brand-primary); font-size: 1.6rem; font-weight: 700; text-decoration: none; transition: 0.2s;" onmouseover="this.querySelector('ion-icon').style.transform='translate(4px, -4px) rotate(-45deg)'" onmouseout="this.querySelector('ion-icon').style.transform='rotate(-45deg)'">
+                View recommended courses <ion-icon name="arrow-forward-outline" style="transition: 0.2s; transform: rotate(-45deg);"></ion-icon>
+            </a>
+        </div>
+        @endforelse
     </div>
 @endsection

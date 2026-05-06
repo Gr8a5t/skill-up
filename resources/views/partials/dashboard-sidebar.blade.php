@@ -8,7 +8,7 @@
         <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}"><ion-icon name="grid-outline"></ion-icon> Dashboard</a>
         <a href="{{ route('courses') }}" class="nav-link {{ request()->routeIs('courses*') ? 'active' : '' }}"><ion-icon name="book-outline"></ion-icon> Courses</a>
         <a href="{{ route('paths') }}" class="nav-link {{ request()->routeIs('paths*') ? 'active' : '' }}"><ion-icon name="map-outline"></ion-icon> Paths</a>
-        <a href="{{ route('dashboard.chats') }}" class="nav-link {{ request()->routeIs('dashboard.chats') ? 'active' : '' }}"><ion-icon name="chatbubbles-outline"></ion-icon> Chats</a>
+        <a href="{{ route('dashboard.forum') }}" class="nav-link {{ request()->routeIs('dashboard.forum') ? 'active' : '' }}"><ion-icon name="people-outline"></ion-icon> Forum</a>
     </div>
     
     <div class="nav-section">

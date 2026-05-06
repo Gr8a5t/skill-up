@@ -20,6 +20,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 Route::middleware('auth')->group(function () {
     Route::get('/user-dashboard', [FitlifeController::class, 'dashboard'])->name('dashboard');
     Route::get('/chats', [FitlifeController::class, 'chats'])->name('dashboard.chats');
+    Route::get('/forum', [FitlifeController::class, 'forum'])->name('dashboard.forum');
     
     // Profile Routing
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
