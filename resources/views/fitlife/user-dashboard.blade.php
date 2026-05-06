@@ -101,7 +101,7 @@
         .mentor-item:last-child { border-bottom: none; padding-bottom: 0; }
         .m-follow-btn { display: inline-flex; align-items: center; gap: 4px; padding: 6px 14px; border: 1px solid var(--brand-primary); color: var(--brand-primary); border-radius: 20px; font-size: 1.2rem; font-weight: 700; background: none; cursor: pointer; transition: 0.2s; }
         .m-follow-btn:hover { background: var(--brand-primary); color: #fff; }
-        .btn-full { width: 100%; display: block; padding: 12px; background: rgba(255, 69, 0, 0.08); color: var(--brand-primary); text-align: center; border-radius: 8px; font-weight: 700; font-size: 1.4rem; text-decoration: none; margin-top: 20px; transition: 0.2s;}
+        .btn-full { width: 100%; display: block; padding: 12px; background: rgba(255, 69, 0, 0.08); color: var(--brand-primary); text-align: center; border-radius: 8px; font-weight: 700; font-size: 1.4rem; text-decoration: none; margin-top: 30px; transition: 0.2s;}
         .btn-full:hover { background: var(--brand-primary); color: #fff; }
 
         @media (max-width: 1200px) {
@@ -140,6 +140,15 @@
             .hero-title { white-space: normal !important; word-break: break-word !important; }
             
             .cw-card { width: 100%; }
+            
+            /* Fix mentor widget spacing */
+            .mentor-list { gap: 15px; }
+            .mentor-item { flex-wrap: nowrap; gap: 15px; justify-content: space-between; align-items: center; }
+            .tbl-mentor { flex-grow: 0; min-width: 0; gap: 12px; }
+            .tbl-m-info { flex-grow: 1; min-width: 0; }
+            .tbl-m-info h5 { font-size: 1.3rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
+            .tbl-m-info p { font-size: 1.1rem; }
+            .m-follow-btn { padding: 5px 10px; font-size: 1.2rem; flex-shrink: 0; margin-left: auto; }
         }
         @media (max-width: 480px) {
             .hero-title { font-size: 1.5rem !important; }
@@ -150,6 +159,8 @@
             .user-name { display: none; }
             .content-area { padding: 10px; }
             .m-details h4 { font-size: 1.2rem; }
+            .m-follow-btn span { display: none; }
+            .m-follow-btn { padding: 8px; border-radius: 50%; }
         }
     </style>
 @endpush
@@ -346,7 +357,7 @@
                             <p>{{ $mentor['role'] }}</p>
                         </div>
                     </div>
-                    <button class="m-follow-btn"><ion-icon name="person-add-outline"></ion-icon> Follow</button>
+                    <button class="m-follow-btn"><ion-icon name="person-add-outline"></ion-icon> <span>Follow</span></button>
                 </div>
                 @endforeach
             </div>
