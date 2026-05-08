@@ -72,10 +72,10 @@
 
         <form wire:submit.prevent="sendMessage" class="feed-input-area">
             <div class="feed-input-wrapper">
-                <ion-icon name="add-circle" style="font-size: 2.2rem; color: var(--text-mut); cursor: pointer;"></ion-icon>
+                <ion-icon name="add-outline" style="font-size: 2.2rem; color: var(--text-mut); cursor: pointer;"></ion-icon>
                 <input type="text" wire:model="newMessage" class="feed-input" placeholder="Type a message...">
-                <button type="submit" class="feed-btn" @if(empty($newMessage)) disabled style="opacity: 0.5;" @endif>
-                    <ion-icon name="send"></ion-icon>
+                <button type="submit" class="feed-btn" @if(empty($newMessage)) disabled style="opacity: 0.3; cursor: default;" @endif>
+                    <ion-icon name="paper-plane"></ion-icon>
                 </button>
             </div>
         </form>
