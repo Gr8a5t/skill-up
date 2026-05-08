@@ -25,7 +25,7 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
-            return redirect()->intended('/dashboard')->with('success', 'Welcome back!');
+            return redirect()->intended(route('dashboard'))->with('success', 'Welcome back!');
         }
 
         return back()->withErrors([
@@ -54,7 +54,7 @@ class AuthController extends Controller
 
         Auth::login($user);
 
-        return redirect('/dashboard')->with('success', 'Account created successfully! Welcome to SkillUp.');
+        return redirect()->route('dashboard')->with('success', 'Account created successfully! Welcome to SkillUp.');
     }
 
     public function logout(Request $request)
