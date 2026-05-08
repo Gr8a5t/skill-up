@@ -29,4 +29,31 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    /**
+     * Get the route key for the model.
+     *
+     * @return string
+     */
+    public function getRouteKey()
+    {
+        return \App\Utils\HashId::encode($this->getKey());
+    }
+
+    /**
+     * Retrieve the model for a bound value.
+     *
+     * @param  mixed  $value
+     * @param  string|null  $field
+     * @return \Illuminate\Database\Eloquent\Model|null
+     */
+    public function resolveRouteBinding($value, $field = null)
+    {
+        $decoded = \App\Utils\HashId::decode($value);
+        
+        if (empty($decoded)) {
+            return null;
+        }
+
+        return parent::resolveRouteBinding($decoded[0], $field);
+    }
 }

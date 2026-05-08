@@ -95,7 +95,7 @@
 
                     <!-- ACTION BUTTONS -->
                     <div style="display:flex; justify-content:flex-end; gap: 1rem; margin-top: 1rem;">
-                        <a href="{{ route('profile.show', $user->id) }}" style="background:#fff; color:#555; padding:0.8rem 1.5rem; border:1px solid #ddd; border-radius:8px; font-weight:600; text-decoration:none; cursor:pointer;">Cancel</a>
+                        <a href="{{ route('profile.show', $user) }}" style="background:#fff; color:#555; padding:0.8rem 1.5rem; border:1px solid #ddd; border-radius:8px; font-weight:600; text-decoration:none; cursor:pointer;">Cancel</a>
                         <button type="submit" style="background:var(--brand-primary); color:#fff; padding:0.8rem 2.5rem; border:none; border-radius:8px; font-weight:700; cursor:pointer; box-shadow: 0 4px 10px rgba(255, 69, 0, 0.2);">Save changes</button>
                     </div>
 

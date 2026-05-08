@@ -13,7 +13,7 @@
             <img src="{{ $comment->avatar }}" class="comment-avatar" alt="User">
             <div class="comment-content" style="width: 100%;">
                             @if($comment->user_id)
-                                <a href="{{ route('profile.show', $comment->user_id) }}" style="text-decoration:none; color:inherit;">{{ $comment->user_name }}</a>
+                                <a href="{{ route('profile.show', \App\Utils\HashId::encode($comment->user_id)) }}" style="text-decoration:none; color:inherit;">{{ $comment->user_name }}</a>
                             @else
                                 {{ $comment->user_name }}
                             @endif
@@ -48,7 +48,7 @@
                         <img src="{{ $reply->avatar }}" class="comment-avatar" alt="User" style="width:34px; height:34px;">
                         <div class="comment-content" style="width: 100%;">
                             @if($reply->user_id)
-                                <a href="{{ route('profile.show', $reply->user_id) }}" style="text-decoration:none; color:inherit;">{{ $reply->user_name }}</a>
+                                <a href="{{ route('profile.show', \App\Utils\HashId::encode($reply->user_id)) }}" style="text-decoration:none; color:inherit;">{{ $reply->user_name }}</a>
                             @else
                                 {{ $reply->user_name }}
                             @endif

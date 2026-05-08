@@ -272,7 +272,7 @@
                 <ion-icon name="ellipsis-vertical" style="color:var(--text-mut); font-size:1.8rem;"></ion-icon>
             </div>
             
-            <a href="{{ route('profile.show', auth()->id()) }}" class="stat-radial" style="display:flex; text-decoration:none; background: conic-gradient(var(--brand-primary) {{ $stats['overall_pct'] }}%, #f0f0f0 0);">
+            <a href="{{ route('profile.show', auth()->user()) }}" class="stat-radial" style="display:flex; text-decoration:none; background: conic-gradient(var(--brand-primary) {{ $stats['overall_pct'] }}%, #f0f0f0 0);">
                 <div class="stat-inner">
                     <img src="{{ auth()->user()->avatar ?? 'https://ui-avatars.com/api/?name='.rawurlencode(auth()->user()->name).'&background=f0ebff&color=8e54e9&rounded=true&size=100' }}" alt="Avatar" style="width: 100%; height: 100%; object-fit:cover;">
                 </div>
