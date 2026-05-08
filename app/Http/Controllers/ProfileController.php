@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
+use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
@@ -37,9 +40,23 @@ class ProfileController extends Controller
 
         $data = $validated;
 
-        // Handle Avatar File Upload
+        // Handle Avatar File Upload with Resizing
         if ($request->hasFile('avatar_file')) {
-            $path = $request->file('avatar_file')->store('avatars', 'public');
+            $file = $request->file('avatar_file');
+            $filename = time() . '.webp'; // Convert to WebP for excellent compression
+            $path = 'avatars/' . $filename;
+
+            // Initialize Intervention Image Manager
+            $manager = new ImageManager(new Driver());
+            
+            // Read, Resize (Cover 500x500), and Encode
+            $image = $manager->decode($file);
+            $image->cover(500, 500);
+            $encoded = $image->encodeUsingFileExtension('webp', 80); // Encode as WebP with 80% quality
+            
+            // Save to public storage
+            Storage::disk('public')->put($path, (string) $encoded);
+            
             $data['avatar'] = asset('storage/' . $path);
         } elseif (!empty($validated['avatar_url'])) {
             $data['avatar'] = $validated['avatar_url'];
