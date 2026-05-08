@@ -65,12 +65,16 @@ RUN apk add --no-cache \
     libzip-dev \
     icu-dev \
     libpng-dev \
+    libwebp-dev \
+    libjpeg-turbo-dev \
+    freetype-dev \
     libxml2-dev \
     oniguruma-dev \
     curl-dev
 
 # Install PHP extensions
-RUN docker-php-ext-install \
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
+    && docker-php-ext-install \
     pdo_pgsql \
     zip \
     intl \
@@ -79,7 +83,8 @@ RUN docker-php-ext-install \
     xml \
     dom \
     mbstring \
-    curl
+    curl \
+    gd
 
 # Copy application files
 COPY . .
