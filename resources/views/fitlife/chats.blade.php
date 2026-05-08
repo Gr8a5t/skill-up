@@ -5,7 +5,7 @@
 @push('styles')
     <style>
         /* Override content-area for full bleed chat split */
-        .content-area { padding: 0 !important; height: calc(100vh - 80px); overflow: hidden; }
+        .content-area { padding: 0 !important; height: calc(100vh - 80px); overflow: hidden; background: #fff; }
         
         .chat-layout { display: flex; height: 100%; background: #fff; }
         
@@ -58,7 +58,8 @@
         .feed-btn { background: none; border: none; font-size: 2.2rem; cursor: pointer; color: var(--brand-primary); display: flex; align-items: center; justify-content: center; transition: 0.2s; }
 
         @media (max-width: 992px) {
-            .content-area { height: calc(100vh - 80px - 80px); } /* Adjust for mobile nav */
+            .content-area { height: calc(100vh - 80px - 70px); } /* Adjust for mobile nav (70px) */
+            body { padding-bottom: 0 !important; }
         }
     </style>
 @endpush
