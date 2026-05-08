@@ -77,7 +77,7 @@ class ChatComponent extends Component
         // Subquery to get the latest message for each user interaction
         $latestMessages = ChatMessage::where('sender_id', $userId)
             ->orWhere('recipient_id', $userId)
-            ->select('id', DB::raw('CASE WHEN sender_id = ' . $userId . ' THEN recipient_id ELSE sender_id END as contact_id'), 'created_at', 'message', 'is_read', 'sender_id')
+            ->select('id', DB::raw('CASE WHEN "sender_id" = ' . $userId . ' THEN "recipient_id" ELSE "sender_id" END as contact_id'), 'created_at', 'message', 'is_read', 'sender_id')
             ->orderBy('created_at', 'desc')
             ->get()
             ->unique('contact_id');
