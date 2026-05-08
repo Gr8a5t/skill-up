@@ -1148,65 +1148,9 @@ class FitlifeController extends Controller
         ];
     }
 
-    public function chats(Request $request)
+    public function chats()
     {
-        $conversations = [
-            [
-                'id' => 1,
-                'name' => 'Ankit Chaudhary',
-                'time' => '1h',
-                'message' => 'your channel will be rock crazy if you can implement th...',
-                'avatar' => 'https://i.pravatar.cc/150?u=ankit',
-                'unread' => false,
-            ],
-            [
-                'id' => 2,
-                'name' => 'Linden Clarkson (1)',
-                'time' => '5h',
-                'message' => 'Hey Lux, welcome to Amplify Views! To get the most ou...',
-                'avatar' => 'https://i.pravatar.cc/150?u=linden',
-                'unread' => true,
-            ],
-            [
-                'id' => 3,
-                'name' => 'Owen Popelycher',
-                'time' => '8h',
-                'message' => 'Hey Lux?',
-                'avatar' => 'https://i.pravatar.cc/150?u=owen',
-                'unread' => false,
-            ],
-        ];
-
-        // Handle direct chat from profile
-        if ($request->has('user_id')) {
-            $user = User::find($request->user_id);
-            if ($user && $user->id !== auth()->id()) {
-                // Check if already in list (simple placeholder logic)
-                $exists = false;
-                foreach ($conversations as $c) {
-                    if ($c['name'] === $user->name) { $exists = true; break; }
-                }
-
-                if (!$exists) {
-                    array_unshift($conversations, [
-                        'id' => $user->id,
-                        'name' => $user->name,
-                        'time' => 'now',
-                        'message' => 'Start a new conversation...',
-                        'avatar' => $user->avatar ?? 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&background=ff4500&color=fff',
-                        'unread' => false,
-                    ]);
-                }
-            }
-        }
-
-        $activeMessages = [
-            ['sender' => $conversations[0]['name'], 'time' => '1:30 PM', 'text' => 'Hey! Have you seen the new design update?', 'is_me' => false],
-            ['sender' => 'You', 'time' => '1:32 PM', 'text' => 'Not yet, just jumping in now.', 'is_me' => true],
-            ['sender' => $conversations[0]['name'], 'time' => '1:35 PM', 'text' => 'It looks great. Your channel will be rock crazy if you can implement this.', 'is_me' => false],
-        ];
-
-        return view('fitlife.chats', compact('conversations', 'activeMessages'));
+        return view('fitlife.chats');
     }
 
     public function forum()

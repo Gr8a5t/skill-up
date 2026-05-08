@@ -37,7 +37,7 @@
                                 <ion-icon name="create-outline"></ion-icon> Edit Profile
                             </a>
                         @elseif(auth()->check())
-                            <a href="{{ route('dashboard.chats', ['user_id' => $user->id]) }}" class="btn" style="background: var(--brand-primary); color: #fff; padding: 10px 22px; border-radius: 10px; font-weight: 700; text-transform: none; display: flex; align-items: center; gap: 8px; font-size: 1.3rem; text-decoration:none;">
+                            <a href="{{ route('dashboard.chats', ['user_id' => $user->getRouteKey()]) }}" class="btn" style="background: var(--brand-primary); color: #fff; padding: 10px 22px; border-radius: 10px; font-weight: 700; text-transform: none; display: flex; align-items: center; gap: 8px; font-size: 1.3rem; text-decoration:none;">
                                 <ion-icon name="chatbubbles-outline"></ion-icon> Message
                             </a>
                         @endif
