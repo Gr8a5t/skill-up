@@ -56,4 +56,9 @@ class User extends Authenticatable
 
         return parent::resolveRouteBinding($decoded[0], $field);
     }
+
+    public function unreadMessagesCount()
+    {
+        return ChatMessage::where('recipient_id', $this->id)->where('is_read', false)->count();
+    }
 }

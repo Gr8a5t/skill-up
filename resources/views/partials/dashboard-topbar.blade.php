@@ -4,7 +4,10 @@
         <input type="text" name="search" class="search-input" placeholder="Search and learn...." value="{{ request('search') }}">
     </form>
     <div class="topbar-right">
-        <a href="{{ route('dashboard.chats') }}" class="icon-btn {{ request()->routeIs('dashboard.chats') ? 'active' : '' }}"><ion-icon name="chatbubbles-outline"></ion-icon></a>
+        <a href="{{ route('dashboard.chats') }}" class="icon-btn {{ request()->routeIs('dashboard.chats') ? 'active' : '' }}" style="position: relative;">
+            <ion-icon name="chatbubbles-outline"></ion-icon>
+            <livewire:chat-badge />
+        </a>
         <a href="#" class="icon-btn"><ion-icon name="notifications-outline"></ion-icon></a>
         <a href="{{ route('profile.show', auth()->user()) }}" class="user-profile" style="text-decoration:none;">
             <div class="user-avatar" style="overflow:hidden;">
