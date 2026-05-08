@@ -30,7 +30,9 @@ class ProfileController extends Controller
             'github_url' => 'nullable|url|max:255',
             'linkedin_url' => 'nullable|url|max:255',
             'avatar_url' => 'nullable|url|max:255',
-            'avatar_file' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'avatar_file' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:30720',
+        ], [
+            'avatar_file.max' => 'Image file too big',
         ]);
 
         $data = $validated;
