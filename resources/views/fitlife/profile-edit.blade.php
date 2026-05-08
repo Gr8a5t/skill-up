@@ -14,7 +14,7 @@
                 <!-- AVATAR SECTION -->
                 <div style="padding: 40px; border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; gap: 40px; background: #fafafa;">
                     <div style="width: 140px; height: 140px; border-radius: 50%; overflow: hidden; background: #eee; border: 5px solid #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.1); flex-shrink: 0;">
-                        <img src="{{ old('avatar', $user->avatar) ?? 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&size=150&background=ff4500&color=fff' }}" alt="Profile Photo" style="width: 100%; height: 100%; object-fit: cover;">
+                        <img src="{{ old('avatar_url', $user->avatar) ?? 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&size=150&background=ff4500&color=fff' }}" alt="Profile Photo" style="width: 100%; height: 100%; object-fit: cover;">
                     </div>
                     <div style="flex-grow: 1;">
                         <h3 style="font-size: 1.8rem; color: #1c1c1c; margin-bottom: 12px; font-weight: 800;">Profile Photo</h3>
@@ -32,7 +32,7 @@
                             <!-- URL Alternative -->
                             <div style="margin-top: 10px;">
                                 <p style="font-size: 1.2rem; color: #666; margin-bottom: 5px; font-weight:500;">Or use an Image URL:</p>
-                                <input type="url" name="avatar_url" value="{{ old('avatar', $user->avatar && str_starts_with($user->avatar, 'http') && !str_contains($user->avatar, '/storage/avatars/') ? $user->avatar : '') }}" placeholder="https://example.com/photo.png" class="form-control" style="width: 100%; max-width:400px; padding: 0.8rem 1rem; border: 1px solid #ddd; border-radius: 8px; font-size: 1.2rem; background: #fff;">
+                                <input type="url" name="avatar_url" value="{{ old('avatar_url', $user->avatar && str_starts_with($user->avatar, 'http') ? $user->avatar : '') }}" placeholder="https://example.com/photo.png" class="form-control" style="width: 100%; max-width:400px; padding: 0.8rem 1rem; border: 1px solid #ddd; border-radius: 8px; font-size: 1.2rem; background: #fff;">
                             </div>
                         </div>
                         

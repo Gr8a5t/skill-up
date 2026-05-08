@@ -92,10 +92,10 @@
 
     <style>
         @media (max-width: 992px) {
-            .chat-side.mobile-hidden, .chat-main.mobile-hidden { display: none; }
+            .chat-side.mobile-hidden, .chat-main.mobile-hidden { display: none !important; }
             .back-btn { display: block !important; }
-            .chat-side { width: 100%; border-right: none; }
-            .chat-main { width: 100%; }
+            .chat-side { width: 100% !important; border-right: none !important; }
+            .chat-main { width: 100% !important; }
         }
         
         /* Auto-scroll helper */

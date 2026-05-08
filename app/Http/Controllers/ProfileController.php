@@ -43,28 +43,22 @@ class ProfileController extends Controller
         // Handle Avatar File Upload with Resizing
         if ($request->hasFile('avatar_file')) {
             $file = $request->file('avatar_file');
-            $filename = time() . '.webp'; // Convert to WebP for excellent compression
+            $filename = time() . '.webp';
             $path = 'avatars/' . $filename;
 
-            // Initialize Intervention Image Manager
             $manager = new ImageManager(new Driver());
-            
-            // Read, Resize (Cover 500x500), and Encode
             $image = $manager->decode($file);
             $image->cover(500, 500);
-            $encoded = $image->encodeUsingFileExtension('webp', 80); // Encode as WebP with 80% quality
+            $encoded = $image->encodeUsingFileExtension('webp', 80);
             
-            // Save to public storage
             Storage::disk('public')->put($path, (string) $encoded);
-            
-            $data['avatar'] = asset('storage/' . $path);
-        } elseif (!empty($validated['avatar_url'])) {
-            $data['avatar'] = $validated['avatar_url'];
+            $data['avatar'] = '/storage/' . $path; // Use relative path for better portability
+        } elseif ($request->filled('avatar_url')) {
+            $data['avatar'] = $request->avatar_url;
         }
 
-        // Remove temporary validation keys from data
-        unset($data['avatar_url']);
-        unset($data['avatar_file']);
+        // Clean up internal data
+        unset($data['avatar_url'], $data['avatar_file']);
 
         $user->update($data);
 

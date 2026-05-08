@@ -58,8 +58,6 @@
         .feed-btn { background: none; border: none; font-size: 2.2rem; cursor: pointer; color: var(--brand-primary); display: flex; align-items: center; justify-content: center; transition: 0.2s; }
 
         @media (max-width: 992px) {
-            .chat-side { width: 100%; border-right: none; }
-            .chat-main { display: none; }
             .content-area { height: calc(100vh - 80px - 80px); } /* Adjust for mobile nav */
         }
     </style>
