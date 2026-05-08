@@ -16,9 +16,7 @@ class ChatBadge extends Component
         return <<<'HTML'
         <div wire:poll.10s>
             @if($this->unreadCount > 0)
-                <span style="position: absolute; top: -5px; right: -5px; background: var(--brand-primary); color: #fff; font-size: 0.9rem; font-weight: 800; border-radius: 50%; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; border: 2px solid #fff;">
-                    {{ $this->unreadCount > 9 ? '9+' : $this->unreadCount }}
-                </span>
+                <span style="position: absolute; top: 0px; right: 0px; background: var(--brand-primary); width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid #fff;"></span>
             @endif
         </div>
         HTML;
