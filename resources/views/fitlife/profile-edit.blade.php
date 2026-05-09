@@ -14,7 +14,7 @@
                 <!-- AVATAR SECTION -->
                 <div style="padding: 40px; border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; gap: 40px; background: #fafafa;">
                     <div style="width: 140px; height: 140px; border-radius: 50%; overflow: hidden; background: #eee; border: 5px solid #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.1); flex-shrink: 0;">
-                        <img src="{{ old('avatar_url', $user->avatar) ?? 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&size=150&background=ff4500&color=fff' }}" alt="Profile Photo" style="width: 100%; height: 100%; object-fit: cover;">
+                        <img id="avatar_preview" src="{{ old('avatar_url', $user->avatar) ?? 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&size=150&background=ff4500&color=fff' }}" alt="Profile Photo" style="width: 100%; height: 100%; object-fit: cover;">
                     </div>
                     <div style="flex-grow: 1;">
                         <h3 style="font-size: 1.8rem; color: #1c1c1c; margin-bottom: 12px; font-weight: 800;">Profile Photo</h3>
@@ -145,5 +145,44 @@
         }
     }
 </style>
+@endpush
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const fileInput = document.getElementById('avatar_file');
+        const urlInput = document.querySelector('input[name="avatar_url"]');
+        const previewImg = document.getElementById('avatar_preview');
+        const originalSrc = previewImg.src;
+
+        fileInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImg.src = e.target.result;
+                }
+                reader.readAsDataURL(this.files[0]);
+                urlInput.value = ''; // clear url if file is chosen
+                this.nextElementSibling.innerText = this.files[0].name;
+            } else if (urlInput.value) {
+                previewImg.src = urlInput.value;
+                this.nextElementSibling.innerText = '';
+            } else {
+                previewImg.src = originalSrc;
+                this.nextElementSibling.innerText = '';
+            }
+        });
+
+        urlInput.addEventListener('input', function() {
+            if (this.value) {
+                previewImg.src = this.value;
+                fileInput.value = ''; // clear file if url is prioritized
+                fileInput.nextElementSibling.innerText = '';
+            } else if (!fileInput.files || fileInput.files.length === 0) {
+                previewImg.src = originalSrc;
+            }
+        });
+    });
+</script>
 @endpush
 @endsection

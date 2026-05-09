@@ -43,16 +43,23 @@ class ProfileController extends Controller
         // Handle Avatar File Upload with Resizing
         if ($request->hasFile('avatar_file')) {
             $file = $request->file('avatar_file');
-            $filename = time() . '.webp';
-            $path = 'avatars/' . $filename;
 
-            $manager = new ImageManager(new Driver());
-            $image = $manager->decode($file);
-            $image->cover(500, 500);
-            $encoded = $image->encodeUsingFileExtension('webp', 80);
-            
-            Storage::disk('public')->put($path, (string) $encoded);
-            $data['avatar'] = '/storage/' . $path; // Use relative path for better portability
+            if (extension_loaded('gd') || extension_loaded('imagick')) {
+                $filename = time() . '.webp';
+                $path = 'avatars/' . $filename;
+
+                $manager = new ImageManager(new Driver());
+                $image = $manager->decode($file);
+                $image->cover(500, 500);
+                $encoded = $image->encodeUsingFileExtension('webp', 80);
+                
+                Storage::disk('public')->put($path, (string) $encoded);
+                $data['avatar'] = '/storage/' . $path;
+            } else {
+                // Fallback: simply store the uploaded file if image driver is missing
+                $path = $file->store('avatars', 'public');
+                $data['avatar'] = '/storage/' . $path;
+            }
         } elseif ($request->filled('avatar_url')) {
             $data['avatar'] = $request->avatar_url;
         }
