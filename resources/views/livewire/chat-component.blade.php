@@ -43,8 +43,8 @@
         @if($activeRecipient)
         <header class="feed-header">
             <div class="feed-user">
-                <button @click="mobileView = 'list'" class="back-btn" style="display: none; background: none; border: none; font-size: 2rem; color: var(--brand-primary); margin-right: 10px; cursor: pointer;" wire:ignore>
-                    <ion-icon name="chevron-back"></ion-icon>
+                <button @click="mobileView = 'list'" class="back-btn" style="display: none; background: none; border: none; font-size: 2rem; color: var(--brand-primary); margin-right: 10px; cursor: pointer;">
+                    <span wire:ignore style="display: flex; align-items: center;"><ion-icon name="chevron-back"></ion-icon></span>
                 </button>
                 <div class="chat-avatar" style="width: 40px; height: 40px;">
                     <img src="{{ $activeRecipient->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($activeRecipient->name) . '&background=f0ebff&color=8e54e9' }}" alt="Active Chat">
