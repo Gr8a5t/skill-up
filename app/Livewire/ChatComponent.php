@@ -100,6 +100,7 @@ class ChatComponent extends Component
                 'time' => $msg->created_at->diffForHumans(null, true),
                 'unread' => $unreadCount > 0,
                 'unread_count' => $unreadCount,
+                'is_online' => $user->isOnline(),
             ];
         }
 

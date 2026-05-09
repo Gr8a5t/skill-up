@@ -14,8 +14,13 @@
         <div class="conversations-list">
             @forelse($conversations as $chat)
             <a href="#" wire:click.prevent="selectRecipient({{ $chat['id'] }})" @click="mobileView = 'feed'" class="chat-item {{ $chat['unread'] ? 'unread' : '' }} {{ $activeRecipientId == $chat['id'] ? 'active' : '' }}">
-                <div class="chat-avatar">
-                    <img src="{{ $chat['avatar'] }}" alt="{{ $chat['name'] }}">
+                <div style="position: relative;">
+                    <div class="chat-avatar">
+                        <img src="{{ $chat['avatar'] }}" alt="{{ $chat['name'] }}">
+                    </div>
+                    @if($chat['is_online'])
+                        <div style="position: absolute; bottom: 0; right: 0; width: 14px; height: 14px; background: #23a55a; border-radius: 50%; border: 2.5px solid #fff; box-shadow: 0 1px 2px rgba(0,0,0,0.1);"></div>
+                    @endif
                 </div>
                 <div class="chat-content">
                     <div class="chat-meta">
@@ -51,7 +56,13 @@
                 </div>
                 <div>
                     <div class="feed-user-name">{{ $activeRecipient->name }}</div>
-                    <div class="feed-status"><div class="status-dot"></div> Active now</div>
+                    <div class="feed-status">
+                        @if($activeRecipient->isOnline())
+                            <div class="status-dot" style="background: #23a55a;"></div> Active now
+                        @else
+                            <div class="status-dot" style="background: #aaa;"></div> Offline
+                        @endif
+                    </div>
                 </div>
             </div>
 
