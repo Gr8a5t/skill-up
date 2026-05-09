@@ -43,7 +43,7 @@
         @if($activeRecipient)
         <header class="feed-header">
             <div class="feed-user">
-                <button @click="mobileView = 'list'" class="back-btn" style="display: none; background: none; border: none; font-size: 2rem; color: var(--brand-primary); margin-right: 10px; cursor: pointer;">
+                <button @click="mobileView = 'list'" class="back-btn" style="display: none; background: none; border: none; font-size: 2rem; color: var(--brand-primary); margin-right: 10px; cursor: pointer;" wire:ignore>
                     <ion-icon name="chevron-back"></ion-icon>
                 </button>
                 <div class="chat-avatar" style="width: 40px; height: 40px;">
@@ -54,10 +54,7 @@
                     <div class="feed-status"><div class="status-dot"></div> Active now</div>
                 </div>
             </div>
-            <div class="feed-actions">
-                <ion-icon name="call-outline" style="font-size: 2rem; color: var(--text-mut); cursor: pointer;"></ion-icon>
-                <ion-icon name="videocam-outline" style="font-size: 2.2rem; color: var(--text-mut); cursor: pointer; margin-left: 15px;"></ion-icon>
-            </div>
+
         </header>
 
         <div class="feed-content" id="chat-feed" wire:poll.5s="markAsRead">
@@ -72,10 +69,12 @@
 
         <form wire:submit.prevent="sendMessage" class="feed-input-area">
             <div class="feed-input-wrapper">
-                <ion-icon name="add-outline" style="font-size: 2.2rem; color: var(--text-mut); cursor: pointer;"></ion-icon>
+                <div wire:ignore style="display: flex; align-items: center;">
+                    <ion-icon name="add-outline" style="font-size: 2.2rem; color: var(--text-mut); cursor: pointer;"></ion-icon>
+                </div>
                 <input type="text" wire:model="newMessage" class="feed-input" placeholder="Type a message...">
                 <button type="submit" class="feed-btn" @if(empty($newMessage)) disabled style="opacity: 0.3; cursor: default;" @endif>
-                    <ion-icon name="paper-plane"></ion-icon>
+                    <span wire:ignore style="display: flex; align-items: center; justify-content: center;"><ion-icon name="paper-plane"></ion-icon></span>
                 </button>
             </div>
         </form>
