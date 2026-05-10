@@ -53,7 +53,7 @@ class FitlifeController extends Controller
         return view('fitlife.about');
     }
 
-    private function getWebDevCourses()
+    public function getWebDevCourses()
     {
         return [
             [
@@ -362,27 +362,54 @@ class FitlifeController extends Controller
     public function updateProgress(Request $request)
     {
         $request->validate([
-            'path_slug' => 'required|string',
-            'module_index' => 'required|integer',
+            'path_slug' => 'nullable|string',
+            'course_slug' => 'nullable|string',
+            'module_index' => 'nullable|integer',
+            'video_id' => 'nullable|string',
+            'progress_seconds' => 'nullable|numeric',
+            'total_seconds' => 'nullable|numeric',
         ]);
 
         $sessionId = session()->getId();
         $userId = auth()->id();
 
-        DB::table('user_path_progress')->updateOrInsert(
-            [
-                'user_id' => $userId,
-                'session_id' => $userId ? null : $sessionId,
-                'path_slug' => $request->path_slug,
-                'module_index' => $request->module_index,
-            ],
-            [
-                'completed' => true,
-                'updated_at' => now(),
-            ]
-        );
+        // Handle Course/Video Progress (YouTube)
+        if ($request->course_slug && $request->video_id) {
+            $progress = \App\Models\UserLessonProgress::updateOrCreate(
+                [
+                    'user_id' => $userId,
+                    'session_id' => $userId ? null : $sessionId,
+                    'course_slug' => $request->course_slug,
+                    'video_id' => $request->video_id,
+                ],
+                [
+                    'progress_seconds' => $request->progress_seconds,
+                    'total_seconds' => $request->total_seconds ?? 0,
+                    'is_completed' => ($request->progress_seconds >= ($request->total_seconds ?? 1) * 0.95),
+                    'updated_at' => now(),
+                ]
+            );
+            return response()->json(['status' => 'success', 'progress' => $progress]);
+        }
 
-        return response()->json(['success' => true]);
+        // Handle Path Module Progress
+        if ($request->path_slug && isset($request->module_index)) {
+            DB::table('user_path_progress')->updateOrInsert(
+                [
+                    'user_id' => $userId,
+                    'session_id' => $userId ? null : $sessionId,
+                    'path_slug' => $request->path_slug,
+                    'module_index' => $request->module_index,
+                ],
+                [
+                    'completed' => true,
+                    'updated_at' => now(),
+                ]
+            );
+            return response()->json(['success' => true]);
+        }
+
+        return response()->json(['error' => 'Invalid data'], 400);
     }
 
     private function skillUpPaths(): array
@@ -1009,22 +1036,7 @@ class FitlifeController extends Controller
 
     public function dashboard()
     {
-        $userId    = auth()->id();
-        $sessionId = session()->getId();
-        
-        $allCourses = $this->getWebDevCourses();
-        
-        $progress = $this->getDashboardProgress($userId, $sessionId, $allCourses);
-        $stats    = $this->getDashboardStats($userId, $sessionId, $progress['slugs']);
-        
-        return view('fitlife.user-dashboard', [
-            'continueWatching' => $this->getDashboardRecommendations($allCourses),
-            'lessons'          => $progress['lessons'],
-            'mentors'          => $this->getDashboardMentors(),
-            'conversations'    => $this->getDashboardConversations($userId, $sessionId),
-            'activityMap'      => $this->getDashboardActivityMap($userId, $sessionId),
-            'stats'            => $stats,
-        ]);
+        return view('fitlife.user-dashboard');
     }
 
     private function getDashboardProgress($userId, $sessionId, $allCourses)
