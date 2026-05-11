@@ -68,6 +68,7 @@
 @endpush
 
 @section('content')
+<div class="content-area">
     <div class="page-header">
         <h1 class="page-title">
             All Courses <span class="count-badge">{{ count($courses) }}</span>
@@ -111,4 +112,5 @@
         </div>
         @endforelse
     </div>
+</div>
 @endsection
