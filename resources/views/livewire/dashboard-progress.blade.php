@@ -1,4 +1,4 @@
-<div wire:poll.10s="loadData" class="content-area">
+<div wire:poll.10s="loadData">
     <div class="left-panel" style="min-width: 0;">
         <div class="hero-banner">
             <div class="hero-stars"></div>

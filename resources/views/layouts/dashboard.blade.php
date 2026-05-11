@@ -141,7 +141,9 @@
                 @include('partials.dashboard-topbar')
             @endif
             
+            <div class="content-area">
                 @yield('content')
+            </div>
         </main>
     </div>
 
