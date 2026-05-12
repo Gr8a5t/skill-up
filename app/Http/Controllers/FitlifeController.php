@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Course;
+use App\Models\Lesson;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -131,38 +133,55 @@ class FitlifeController extends Controller
 
     public function courses(Request $request)
     {
-        $allCourses = $this->getWebDevCourses();
         $search = $request->input('search');
 
+        // Pull published DB courses first
+        $dbCourses = Course::where('is_published', true)->with('lessons')->get()->map(function ($c) {
+            return [
+                'slug'        => $c->slug,
+                'title'       => $c->title,
+                'level'       => $c->level,
+                'category'    => $c->category,
+                'tags'        => [$c->category, $c->level],
+                'color'       => $c->color,
+                'icon'        => $c->icon,
+                'playlist_id' => $c->playlist_id,
+                '_source'     => 'db',
+            ];
+        })->keyBy('slug')->toArray();
+
+        // Merge with hardcoded (hardcoded fills in if slug not in DB yet)
+        $hardcoded = collect($this->getWebDevCourses())->keyBy('slug')->toArray();
+        $allCourses = array_values(array_merge($hardcoded, $dbCourses));
+
         if ($search) {
-            $courses = array_filter($allCourses, function ($course) use ($search) {
+            $allCourses = array_values(array_filter($allCourses, function ($course) use ($search) {
                 return str_contains(strtolower($course['title']), strtolower($search)) ||
                        str_contains(strtolower($course['category']), strtolower($search)) ||
-                       str_contains(strtolower(implode(' ', $course['tags'])), strtolower($search));
-            });
-        } else {
-            $courses = $allCourses;
+                       str_contains(strtolower(implode(' ', $course['tags'] ?? [])), strtolower($search));
+            }));
         }
 
+        $courses = $allCourses;
         return view('fitlife.courses', compact('courses'));
     }
 
     public function courseLearn(string $slug)
     {
         $youtubeKey = config('services.youtube.key');
-        
+
+        // Try DB first, fall back to hardcoded array
+        $dbCourse = Course::where('slug', $slug)->with('lessons')->first();
         $allCourses = $this->getWebDevCourses();
-        $courseData = collect($allCourses)->firstWhere('slug', $slug) ?? $allCourses[5];
-        
-        $playlistId = $courseData['playlist_id'];
-        
+        $hardcodedData = collect($allCourses)->firstWhere('slug', $slug) ?? $allCourses[0];
+
+        // Merge: prefer DB values where set
+        $playlistId = $dbCourse?->playlist_id ?? $hardcodedData['playlist_id'] ?? null;
+
         $items = [];
         $apiError = null;
 
-        if (empty($youtubeKey)) {
-            $apiError = 'YOUTUBE_API_KEY is not configured on this server.';
-            Log::error('[CourseLearn] ' . $apiError);
-        } else {
+        if ($playlistId && !empty($youtubeKey)) {
             try {
                 $response = Http::timeout(8)->get('https://www.googleapis.com/youtube/v3/playlistItems', [
                     'part'       => 'snippet',
@@ -170,9 +189,7 @@ class FitlifeController extends Controller
                     'maxResults' => 20,
                     'key'        => $youtubeKey,
                 ]);
-
                 $json = $response->json();
-
                 if (isset($json['error'])) {
                     $apiError = $json['error']['message'] ?? 'Unknown YouTube API error';
                     Log::error('[CourseLearn] YouTube API error: ' . $apiError);
@@ -183,78 +200,116 @@ class FitlifeController extends Controller
                 $apiError = $e->getMessage();
                 Log::error('[CourseLearn] HTTP exception: ' . $apiError);
             }
+        } elseif (empty($youtubeKey)) {
+            $apiError = 'YOUTUBE_API_KEY is not configured.';
+            Log::error('[CourseLearn] ' . $apiError);
         }
 
-        $course = [
-            'title' => $courseData['title'],
-            'category' => $courseData['category'],
-            'level' => $courseData['level'],
-            'lessons_count' => count($items),
-            'duration' => 'Self Paced', // Duration from YouTube requires another API call, keeping simple
-            'video_id' => $items[0]['snippet']['resourceId']['videoId'] ?? 'SqcY0GlETPk', 
-            'recap' => 'In this course, we will build a modern application from scratch. You will learn about core syntax, state, context, and more.',
-            'concepts' => [
-                'Understanding ' . $courseData['title'] . ' fundamentals',
+        // Build recap & concepts — prefer DB content
+        $recap = $dbCourse?->recap
+            ?? 'In this course, we will build a modern application from scratch. You will learn about core syntax, state, context, and more.';
+
+        $concepts = $dbCourse?->key_concepts
+            ?? [
+                'Understanding ' . ($dbCourse?->title ?? $hardcodedData['title']) . ' fundamentals',
                 'Managing state and side effects',
                 'Applying styles and components',
-                'Deploying to production'
-            ]
+                'Deploying to production',
+            ];
+
+        $firstVideoId = count($items) > 0
+            ? ($items[0]['snippet']['resourceId']['videoId'] ?? 'SqcY0GlETPk')
+            : 'SqcY0GlETPk';
+
+        $course = [
+            'title'         => $dbCourse?->title ?? $hardcodedData['title'],
+            'category'      => $dbCourse?->category ?? $hardcodedData['category'],
+            'level'         => $dbCourse?->level ?? $hardcodedData['level'],
+            'lessons_count' => count($items),
+            'duration'      => 'Self Paced',
+            'video_id'      => $firstVideoId,
+            'recap'         => $recap,
+            'concepts'      => $concepts,
+            'source_files_url' => $dbCourse?->source_files_url,
+            'cheatsheet_url'   => $dbCourse?->cheatsheet_url,
         ];
 
-        // Check active video from request or default to first
         $activeVideoId = request('v', $course['video_id']);
-        $course['video_id'] = $activeVideoId; // The one currently playing
+        $course['video_id'] = $activeVideoId;
+
+        // Progress records for this user/session
+        $progressRecords = [];
+        if (auth()->check()) {
+            $progressRecords = \App\Models\UserLessonProgress::where('course_slug', $slug)
+                ->where('user_id', auth()->id())
+                ->get()->keyBy('video_id');
+        } else {
+            $progressRecords = \App\Models\UserLessonProgress::where('course_slug', $slug)
+                ->where('session_id', session()->getId())
+                ->get()->keyBy('video_id');
+        }
 
         $lessons = [];
-        if (count($items) > 0) {
-            // Fetch user progress for this course
-            $progressRecords = [];
-            if (auth()->check()) {
-                $progressRecords = \App\Models\UserLessonProgress::where('course_slug', $slug)
-                    ->where('user_id', auth()->id())
-                    ->get()->keyBy('video_id');
-            } else {
-                $sessionId = session()->getId();
-                $progressRecords = \App\Models\UserLessonProgress::where('course_slug', $slug)
-                    ->where('session_id', $sessionId)
-                    ->get()->keyBy('video_id');
-            }
 
-            foreach($items as $item) {
+        if (count($items) > 0) {
+            // YouTube API succeeded — use playlist items
+            foreach ($items as $item) {
                 $vidId = $item['snippet']['resourceId']['videoId'];
                 $progressRec = $progressRecords[$vidId] ?? null;
                 $pct = 0;
                 if ($progressRec && $progressRec->total_seconds > 0) {
                     $pct = min(100, round(($progressRec->progress_seconds / $progressRec->total_seconds) * 100));
                 }
-
                 $lessons[] = [
                     'video_id' => $vidId,
-                    'title' => $item['snippet']['title'],
-                    'time' => 'Video', // 'time' removed as it requires extra API calls
+                    'title'    => $item['snippet']['title'],
+                    'time'     => 'Video',
                     'progress' => $pct,
-                    'active' => ($vidId === $activeVideoId),
+                    'active'   => ($vidId === $activeVideoId),
                 ];
             }
+        } elseif ($dbCourse && $dbCourse->lessons->isNotEmpty()) {
+            // YouTube API failed but we have DB lessons — use them
+            $firstDbId = $dbCourse->lessons->first()->video_id;
+            if ($activeVideoId === 'SqcY0GlETPk') {
+                $activeVideoId = $firstDbId;
+                $course['video_id'] = $firstDbId;
+            }
+
+            foreach ($dbCourse->lessons as $lesson) {
+                $vidId = $lesson->video_id;
+                $progressRec = $progressRecords[$vidId] ?? null;
+                $pct = 0;
+                if ($progressRec && $progressRec->total_seconds > 0) {
+                    $pct = min(100, round(($progressRec->progress_seconds / $progressRec->total_seconds) * 100));
+                }
+                $lessons[] = [
+                    'video_id' => $vidId,
+                    'title'    => $lesson->title,
+                    'time'     => 'Video',
+                    'progress' => $pct,
+                    'active'   => ($vidId === $activeVideoId),
+                ];
+            }
+            $course['lessons_count'] = count($lessons);
         } else {
-            // Fallback if API fails — use a sensible first video per course
+            // Last resort: hardcoded fallback
             $fallbackVideos = [
-                'html-basics'      => 'it1rTvBcfRg',
-                'css-styling'      => 'wRNinF7YQqQ',
-                'modern-javascript'=> 'W6NZfCO5SIk',
-                'php-fundamentals' => 'OK_JCtrrv-c',
-                'laravel-mastery'  => 'Rz6SMgKrSYE',
-                'react-beginners'  => 'SqcY0GlETPk',
-                'ai-agents-intro'  => 'VMj-3S1tku0',
+                'html-basics'       => 'it1rTvBcfRg',
+                'css-styling'       => 'wRNinF7YQqQ',
+                'modern-javascript' => 'W6NZfCO5SIk',
+                'php-fundamentals'  => 'OK_JCtrrv-c',
+                'laravel-mastery'   => 'Rz6SMgKrSYE',
+                'react-beginners'   => 'SqcY0GlETPk',
+                'ai-agents-intro'   => 'VMj-3S1tku0',
             ];
             $fallbackId = $fallbackVideos[$slug] ?? 'SqcY0GlETPk';
             $lessons = [
-                ['video_id' => $fallbackId, 'title' => $courseData['title'] . ' — Intro', 'time' => 'Video', 'progress' => 0, 'active' => true],
+                ['video_id' => $fallbackId, 'title' => $hardcodedData['title'] . ' — Intro', 'time' => 'Video', 'progress' => 0, 'active' => true],
             ];
             $course['video_id'] = $fallbackId;
             $activeVideoId = $fallbackId;
         }
-
 
         return view('fitlife.course-learn', compact('course', 'lessons', 'slug'));
     }

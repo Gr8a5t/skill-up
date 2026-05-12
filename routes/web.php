@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\FitlifeController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\AdminController;
 
 Route::get('/', [FitlifeController::class, 'index'])->name('home');
 Route::get('/about', [FitlifeController::class, 'about'])->name('about');
@@ -34,4 +35,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/courses/{slug}/learn', [FitlifeController::class, 'courseLearn'])->name('courses.learn');
     Route::post('/api/progress', [FitlifeController::class, 'updateProgress'])->name('paths.progress');
     
+    // Admin Routes
+    Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+    Route::get('/admin/courses', [AdminController::class, 'courses'])->name('admin.courses');
+    Route::get('/admin/courses/create', [AdminController::class, 'createCourse'])->name('admin.courses.create');
+    Route::post('/admin/courses', [AdminController::class, 'storeCourse'])->name('admin.courses.store');
+    Route::get('/admin/courses/{course}/edit', [AdminController::class, 'editCourse'])->name('admin.courses.edit');
+    Route::put('/admin/courses/{course}', [AdminController::class, 'updateCourse'])->name('admin.courses.update');
+    Route::delete('/admin/courses/{course}', [AdminController::class, 'deleteCourse'])->name('admin.courses.delete');
 });

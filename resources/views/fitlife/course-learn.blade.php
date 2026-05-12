@@ -232,26 +232,20 @@
                 <div id="tab-files" class="tab-pane">
                     <section class="content-section">
                         <h2 class="section-label">Source Code & Assets</h2>
-                        <div class="resource-card">
+                        @if(!empty($course['source_files_url']))
+                        <a href="{{ $course['source_files_url'] }}" target="_blank" class="resource-card" style="text-decoration:none;color:inherit;display:flex;">
                             <div class="resource-left">
                                 <div class="resource-icon"><ion-icon name="logo-github"></ion-icon></div>
                                 <div class="resource-info">
-                                    <h4>Starter Template</h4>
-                                    <p>ZIP file - 2.4 MB</p>
+                                    <h4>Source Files</h4>
+                                    <p>Open in new tab</p>
                                 </div>
                             </div>
-                            <button class="download-btn">Download</button>
-                        </div>
-                        <div class="resource-card">
-                            <div class="resource-left">
-                                <div class="resource-icon"><ion-icon name="document-text"></ion-icon></div>
-                                <div class="resource-info">
-                                    <h4>Lesson Slide Deck</h4>
-                                    <p>PDF Document - 5.1 MB</p>
-                                </div>
-                            </div>
-                            <button class="download-btn">Download</button>
-                        </div>
+                            <ion-icon name="open-outline" style="font-size:1.8rem;color:#bbb;"></ion-icon>
+                        </a>
+                        @else
+                        <p style="color:var(--text-mut);font-size:1.3rem;">No source files provided for this course yet.</p>
+                        @endif
                     </section>
                 </div>
 
@@ -259,26 +253,20 @@
                 <div id="tab-resources" class="tab-pane">
                     <section class="content-section">
                         <h2 class="section-label">Helpful Links</h2>
-                        <a href="#" style="text-decoration: none; color: inherit; display: block;" class="resource-card">
+                        @if(!empty($course['cheatsheet_url']))
+                        <a href="{{ $course['cheatsheet_url'] }}" target="_blank" style="text-decoration:none;color:inherit;display:block;" class="resource-card">
                             <div class="resource-left">
-                                <div class="resource-icon" style="background:#fdfcf0; color: #e5b300;"><ion-icon name="book-outline"></ion-icon></div>
+                                <div class="resource-icon" style="background:#fdfcf0;color:#e5b300;"><ion-icon name="book-outline"></ion-icon></div>
                                 <div class="resource-info">
-                                    <h4>Official Documentation</h4>
-                                    <p>Read the official setup guides.</p>
+                                    <h4>Cheat Sheet / Documentation</h4>
+                                    <p>Read the official guides.</p>
                                 </div>
                             </div>
-                            <ion-icon name="open-outline" style="font-size: 1.8rem; color: #bbb;"></ion-icon>
+                            <ion-icon name="open-outline" style="font-size:1.8rem;color:#bbb;"></ion-icon>
                         </a>
-                        <a href="#" style="text-decoration: none; color: inherit; display: block;" class="resource-card">
-                            <div class="resource-left">
-                                <div class="resource-icon" style="background:#f0e6fa; color: #7f39fb;"><ion-icon name="library-outline"></ion-icon></div>
-                                <div class="resource-info">
-                                    <h4>Community Cheat Sheet</h4>
-                                    <p>Interactive web cheat sheet.</p>
-                                </div>
-                            </div>
-                            <ion-icon name="open-outline" style="font-size: 1.8rem; color: #bbb;"></ion-icon>
-                        </a>
+                        @else
+                        <p style="color:var(--text-mut);font-size:1.3rem;">No additional resources provided for this course yet.</p>
+                        @endif
                     </section>
                 </div>
 
