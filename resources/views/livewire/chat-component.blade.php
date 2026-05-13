@@ -71,7 +71,7 @@
         <div class="feed-content" id="chat-feed" wire:poll.5s="markAsRead">
             @foreach($messages as $m)
             <div class="msg-line {{ $m->sender_id === auth()->id() ? 'me' : 'other' }}">
-                <div class="msg-bubble">{{ $m->message }}</div>
+                <div class="msg-bubble">{!! preg_replace('~(https?://[^\s]+)~', '<a href="$1" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline; font-weight: bold;">$1</a>', e($m->message)) !!}</div>
                 <div class="msg-time">{{ $m->created_at->format('g:i A') }}</div>
             </div>
             @endforeach

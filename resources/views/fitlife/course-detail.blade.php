@@ -23,7 +23,7 @@
                             <span class="badge">{{ $course['tags'][0] ?? 'UI / UX Design' }}</span>
                         </div>
                         <div class="header-right">
-                            <a href="#" class="btn-share">Share</a>
+                            <a href="#" class="btn-share" onclick="event.preventDefault(); shareCourse();">Share</a>
                             <a href="{{ $course['coursera_link'] }}" target="_blank" class="btn btn-primary btn-enroll">
                                 <ion-icon name="lock-closed-outline"></ion-icon> Enroll Now
                             </a>
@@ -141,4 +141,21 @@
             </section>
         </article>
     </main>
+
+    <script>
+    function shareCourse() {
+        const shareData = {
+            title: '{{ addslashes($course["title"]) }}',
+            text: 'Check out this amazing course on SkillUp!',
+            url: window.location.href
+        };
+        if (navigator.share) {
+            navigator.share(shareData).catch(console.error);
+        } else {
+            navigator.clipboard.writeText(shareData.url).then(() => {
+                alert('Course link copied to clipboard!');
+            });
+        }
+    }
+    </script>
 @endsection

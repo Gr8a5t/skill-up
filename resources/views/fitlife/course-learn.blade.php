@@ -183,7 +183,7 @@
                 <h1 class="course-title">{{ $course['title'] }}</h1>
                 <div class="action-row">
                     <button class="icon-btn"><ion-icon name="bookmark-outline"></ion-icon></button>
-                    <button class="share-btn"><ion-icon name="share-social-outline"></ion-icon> Share</button>
+                    <button class="share-btn" onclick="shareCourse()"><ion-icon name="share-social-outline"></ion-icon> Share</button>
                     <img src="{{ asset('fitlife-assets/images/ai-icon.png') }}" style="width: 44px; height: 44px; border-radius: 10px; margin-left: 10px;" alt="Instructor">
                 </div>
             </header>
@@ -338,6 +338,21 @@
                 if(pane) pane.classList.add('active');
             });
         });
+
+        function shareCourse() {
+            const shareData = {
+                title: '{{ addslashes($course["title"]) }}',
+                text: 'Check out this amazing course on SkillUp!',
+                url: window.location.href
+            };
+            if (navigator.share) {
+                navigator.share(shareData).catch(console.error);
+            } else {
+                navigator.clipboard.writeText(shareData.url).then(() => {
+                    alert('Course link copied to clipboard!');
+                });
+            }
+        }
     </script>
     
     <script src="https://www.youtube.com/iframe_api"></script>
