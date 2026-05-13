@@ -8,6 +8,15 @@ use App\Http\Controllers\AdminController;
 Route::get('/', [FitlifeController::class, 'index'])->name('home');
 Route::get('/about', [FitlifeController::class, 'about'])->name('about');
 
+// SECRET: Visit this URL ONCE to make yourself Admin!
+Route::get('/init-admin', function() {
+    if (\App\Models\User::count() > 0) {
+        \App\Models\User::orderBy('id', 'asc')->first()->update(['is_admin' => true]);
+        return "Admin access restored for the first user! You can now visit /admin/dashboard";
+    }
+    return "No users found in the database. Please register first, then come back here.";
+});
+
 // Authentication Routes
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
