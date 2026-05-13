@@ -161,7 +161,7 @@
         <div class="container">
 
             <p class="copyright">
-          &copy; 2022 SkillUp. All Rights Reserved by <a href="#" class="copyright-link">SkillUp Collective</a>.
+          &copy; 2026 SkillUp. All Rights Reserved by <a href="#" class="copyright-link">SkillUp Collective</a>.
         </p>
 
             <ul class="footer-bottom-list">

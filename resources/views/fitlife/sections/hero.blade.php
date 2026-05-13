@@ -15,7 +15,7 @@
                 without a paywall or fluff.
             </p>
 
-            <a href="#about" class="btn btn-primary">Browse skill paths</a>
+            <a href="/courses" class="btn btn-primary">Browse skill paths</a>
 
         </div>
 
