@@ -31,10 +31,23 @@ else
 fi
 
 echo "Checking database connection..."
-php artisan db:monitor || echo "Database connection failed, but proceeding anyway..."
+# Try to connect up to 5 times
+NEXT_WAIT_TIME=0
+until php artisan db:monitor || [ $NEXT_WAIT_TIME -eq 5 ]; do
+   echo "Waiting for database connection... ($NEXT_WAIT_TIME/5)"
+   sleep 2
+   NEXT_WAIT_TIME=$((NEXT_WAIT_TIME+1))
+done
 
 echo "Running migrations..."
-php artisan migrate --force --no-interaction
+php artisan migrate --force --no-interaction || echo "Migration failed! Check your DB settings."
+
+echo "Migration Status:"
+php artisan migrate:status
+
+echo "Ensuring storage permissions..."
+# Ensure www-data can write to storage despite container quirks
+chmod -R 777 /var/www/html/storage /var/www/html/bootstrap/cache
 
 echo "Creating storage link..."
 php artisan storage:link --force || echo "Storage link already exists."
