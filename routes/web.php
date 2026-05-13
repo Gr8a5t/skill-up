@@ -6,6 +6,17 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminController;
 
 Route::get('/', [FitlifeController::class, 'index'])->name('home');
+
+// TEMPORARY: Promote first user to admin on fresh DB.
+// Update: Register first, then refresh the homepage to activate!
+try {
+    if (Schema::hasTable('users')) {
+        if (\App\Models\User::count() > 0 && !\App\Models\User::where('is_admin', true)->exists()) {
+            \App\Models\User::orderBy('id', 'asc')->first()->update(['is_admin' => true]);
+        }
+    }
+} catch (\Exception $e) {}
+
 Route::get('/about', [FitlifeController::class, 'about'])->name('about');
 
 // Authentication Routes
