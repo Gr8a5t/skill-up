@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 
 class ChatComponent extends Component
 {
-    public $activeRecipientId;
+    public $activeRecipientHash;
     public $newMessage;
     public $search = '';
 
@@ -20,8 +20,7 @@ class ChatComponent extends Component
     public function mount($recipientId = null)
     {
         if ($recipientId) {
-            $decoded = \App\Utils\HashId::decode($recipientId);
-            $this->activeRecipientId = !empty($decoded) ? $decoded[0] : $recipientId;
+            $this->activeRecipientHash = $recipientId;
         } else {
             // Default to the most recent conversation
             $latestMessage = ChatMessage::where('sender_id', auth()->id())
@@ -30,29 +29,31 @@ class ChatComponent extends Component
                 ->first();
 
             if ($latestMessage) {
-                $this->activeRecipientId = $latestMessage->sender_id === auth()->id() 
+                $recipientId = $latestMessage->sender_id === auth()->id() 
                     ? $latestMessage->recipient_id 
                     : $latestMessage->sender_id;
+                $this->activeRecipientHash = \App\Utils\HashId::encode($recipientId);
             }
         }
     }
 
     public function selectRecipient($id)
     {
-        $this->activeRecipientId = $id;
+        $this->activeRecipientHash = $id;
         $this->markAsRead();
         $this->reset('newMessage');
     }
 
     public function sendMessage()
     {
-        if (!$this->activeRecipientId) return;
+        $decoded = \App\Utils\HashId::decode($this->activeRecipientHash);
+        if (empty($decoded)) return;
 
         $this->validate();
 
         ChatMessage::create([
             'sender_id' => auth()->id(),
-            'recipient_id' => $this->activeRecipientId,
+            'recipient_id' => $decoded[0],
             'message' => $this->newMessage,
         ]);
 
@@ -62,8 +63,9 @@ class ChatComponent extends Component
 
     public function markAsRead()
     {
-        if ($this->activeRecipientId) {
-            ChatMessage::where('sender_id', $this->activeRecipientId)
+        $decoded = \App\Utils\HashId::decode($this->activeRecipientHash);
+        if (!empty($decoded)) {
+            ChatMessage::where('sender_id', $decoded[0])
                 ->where('recipient_id', auth()->id())
                 ->where('is_read', false)
                 ->update(['is_read' => true]);
@@ -93,7 +95,7 @@ class ChatComponent extends Component
                 ->count();
 
             $conversations[] = [
-                'id' => $user->id,
+                'id' => \App\Utils\HashId::encode($user->id),
                 'name' => $user->name,
                 'avatar' => $user->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($user->name) . '&background=f0ebff&color=8e54e9',
                 'message' => $msg->message,
@@ -116,12 +118,14 @@ class ChatComponent extends Component
 
     public function getMessagesProperty()
     {
-        if (!$this->activeRecipientId) return collect();
+        $decoded = \App\Utils\HashId::decode($this->activeRecipientHash);
+        if (empty($decoded)) return collect();
+        $recipientId = $decoded[0];
 
-        return ChatMessage::where(function ($q) {
-                $q->where('sender_id', auth()->id())->where('recipient_id', $this->activeRecipientId);
-            })->orWhere(function ($q) {
-                $q->where('sender_id', $this->activeRecipientId)->where('recipient_id', auth()->id());
+        return ChatMessage::where(function ($q) use ($recipientId) {
+                $q->where('sender_id', auth()->id())->where('recipient_id', $recipientId);
+            })->orWhere(function ($q) use ($recipientId) {
+                $q->where('sender_id', $recipientId)->where('recipient_id', auth()->id());
             })
             ->orderBy('created_at', 'asc')
             ->get();
@@ -129,7 +133,8 @@ class ChatComponent extends Component
 
     public function getActiveRecipientProperty()
     {
-        return User::find($this->activeRecipientId);
+        $decoded = \App\Utils\HashId::decode($this->activeRecipientHash);
+        return !empty($decoded) ? User::find($decoded[0]) : null;
     }
 
     public function render()

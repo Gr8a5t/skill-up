@@ -22,7 +22,7 @@
                 <div class="comment-actions">
                     @php
                         $userIdentifier = auth()->check() ? auth()->id() : session()->getId();
-                        $hasLiked = is_array($comment->liked_by) && in_array($userIdentifier, $comment->liked_by);
+                        $hasLiked = $comment->isLikedBy($userIdentifier);
                     @endphp
                     <button wire:click="likeComment({{ $comment->id }})" class="{{ $hasLiked ? 'liked' : '' }}" style="display:flex; align-items:center; gap:4px; {{ $hasLiked ? 'color: var(--brand-primary);' : '' }}">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="{{ $hasLiked ? 'currentColor' : 'none' }}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

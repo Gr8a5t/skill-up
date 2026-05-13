@@ -20,6 +20,9 @@ return Application::configure(basePath: dirname(__DIR__))
             guests: '/login',
             users: '/user-dashboard'
         );
+        $middleware->alias([
+            'admin' => \App\Http\Middleware\IsAdmin::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

@@ -1,4 +1,4 @@
-<div class="chat-layout" x-data="{ mobileView: '{{ $activeRecipientId ? 'feed' : 'list' }}' }">
+<div class="chat-layout" x-data="{ mobileView: '{{ $activeRecipientHash ? 'feed' : 'list' }}' }">
     <!-- Left Column: Conversations List -->
     <aside class="chat-side" :class="{ 'mobile-hidden': mobileView === 'feed' }">
         <header class="list-header">
@@ -13,7 +13,7 @@
 
         <div class="conversations-list">
             @forelse($conversations as $chat)
-            <a href="#" wire:click.prevent="selectRecipient({{ $chat['id'] }})" @click="mobileView = 'feed'" class="chat-item {{ $chat['unread'] ? 'unread' : '' }} {{ $activeRecipientId == $chat['id'] ? 'active' : '' }}">
+            <a href="#" wire:click.prevent="selectRecipient('{{ $chat['id'] }}')" @click="mobileView = 'feed'" class="chat-item {{ $chat['unread'] ? 'unread' : '' }} {{ $activeRecipientHash == $chat['id'] ? 'active' : '' }}">
                 <div style="position: relative;">
                     <div class="chat-avatar">
                         <img src="{{ $chat['avatar'] }}" alt="{{ $chat['name'] }}">
