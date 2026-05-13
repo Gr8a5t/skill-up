@@ -187,7 +187,7 @@
 
             const slot = document.createElement('span');
             slot.className = 'heatmap-month-slot';
-            slot.style.width = '14px';   // 11px + 3px gap
+            slot.style.width = '11px';
             slot.style.display = 'inline-block';
             slot.style.fontSize = '10px';
 
