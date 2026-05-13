@@ -8,20 +8,6 @@ use App\Http\Controllers\AdminController;
 Route::get('/', [FitlifeController::class, 'index'])->name('home');
 Route::get('/about', [FitlifeController::class, 'about'])->name('about');
 
-// SECRET: Visit this URL to see who is in the DB and make them Admin!
-Route::get('/init-admin', function() {
-    $users = \App\Models\User::all();
-    $count = $users->count();
-    
-    if ($count > 0) {
-        \App\Models\User::query()->update(['is_admin' => true]);
-        $details = $users->map(fn($u) => "ID: {$u->id} | Name: {$u->name} | Email: {$u->email}")->implode('<br>');
-        return "<strong>Found {$count} users:</strong><br>{$details}<br><br><strong>ACTION:</strong> Everyone listed above is now an Admin! Try the dashboard.";
-    }
-    
-    return "The database is empty. Please register first!";
-});
-
 // Authentication Routes
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
