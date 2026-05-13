@@ -12,6 +12,8 @@ class ChatComponent extends Component
     public $activeRecipientHash;
     public $newMessage;
     public $search = '';
+    public $editingMessageId = null;
+    public $editingMessageText = '';
 
     protected $rules = [
         'newMessage' => 'required|string|max:1000',
@@ -59,6 +61,60 @@ class ChatComponent extends Component
 
         $this->reset('newMessage');
         $this->dispatch('message-sent');
+    }
+
+    public function startEditMessage($id)
+    {
+        $message = ChatMessage::findOrFail($id);
+        if ($message->sender_id !== auth()->id()) return;
+        
+        // Only allow editing if message is less than 5 minutes old
+        if ($message->created_at->diffInMinutes() >= 5) {
+            $this->dispatch('notify', ['message' => 'Time limit for editing (5m) has passed.', 'type' => 'error']);
+            return;
+        }
+
+        $this->editingMessageId = $id;
+        $this->editingMessageText = $message->message;
+    }
+
+    public function cancelEditMessage()
+    {
+        $this->editingMessageId = null;
+        $this->editingMessageText = '';
+    }
+
+    public function updateMessage()
+    {
+        if (!$this->editingMessageId) return;
+
+        $message = ChatMessage::findOrFail($this->editingMessageId);
+        if ($message->sender_id !== auth()->id()) return;
+
+        if ($message->created_at->diffInMinutes() >= 5) {
+            $this->dispatch('notify', ['message' => 'Time limit for editing (5m) has passed.', 'type' => 'error']);
+            $this->cancelEditMessage();
+            return;
+        }
+
+        $this->validate([
+            'editingMessageText' => 'required|string|max:1000',
+        ]);
+
+        $message->update([
+            'message' => $this->editingMessageText,
+        ]);
+
+        $this->cancelEditMessage();
+    }
+
+    public function deleteMessage($id)
+    {
+        $message = ChatMessage::findOrFail($id);
+        if ($message->sender_id !== auth()->id()) return;
+
+        $message->delete();
+        $this->dispatch('message-deleted');
     }
 
     public function markAsRead()

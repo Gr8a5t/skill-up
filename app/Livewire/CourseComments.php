@@ -11,6 +11,8 @@ class CourseComments extends Component
     public $newComment = '';
     public $replyComment = '';
     public $replyingTo = null;
+    public $editingCommentId = null;
+    public $editingCommentText = '';
 
     public function mount($courseSlug)
     {
@@ -89,6 +91,63 @@ class CourseComments extends Component
             }
             $comment->save();
         }
+    }
+
+    public function startEditComment($id)
+    {
+        $comment = CourseComment::findOrFail($id);
+        if ($comment->user_id !== auth()->id()) return;
+
+        // 5 minute window
+        if ($comment->created_at->diffInMinutes() >= 5) {
+            $this->dispatch('notify', ['message' => 'Time limit for editing (5m) has passed.', 'type' => 'error']);
+            return;
+        }
+
+        $this->editingCommentId = $id;
+        $this->editingCommentText = $comment->content;
+    }
+
+    public function cancelEditComment()
+    {
+        $this->editingCommentId = null;
+        $this->editingCommentText = '';
+    }
+
+    public function updateComment()
+    {
+        if (!$this->editingCommentId) return;
+
+        $comment = CourseComment::findOrFail($this->editingCommentId);
+        if ($comment->user_id !== auth()->id()) return;
+
+        if ($comment->created_at->diffInMinutes() >= 5) {
+            $this->dispatch('notify', ['message' => 'Time limit for editing (5m) has passed.', 'type' => 'error']);
+            $this->cancelEditComment();
+            return;
+        }
+
+        $this->validate([
+            'editingCommentText' => 'required|string|max:1000',
+        ]);
+
+        $comment->update([
+            'content' => $this->editingCommentText,
+        ]);
+
+        $this->cancelEditComment();
+    }
+
+    public function deleteComment($id)
+    {
+        $comment = CourseComment::findOrFail($id);
+        if ($comment->user_id !== auth()->id()) return;
+
+        // Delete replies too
+        $comment->replies()->delete();
+        $comment->delete();
+        
+        $this->dispatch('comment-deleted');
     }
 
     public function render()
