@@ -59,8 +59,9 @@
         .feed-btn { background: none; border: none; font-size: 2.2rem; cursor: pointer; color: var(--brand-primary); display: flex; align-items: center; justify-content: center; transition: 0.2s; }
 
         @media (max-width: 992px) {
-            .content-area { height: calc(100vh - 80px - 60px); } /* Use slightly less subtraction to fill more space */
+            .content-area { height: calc(100vh - 80px); } 
             body { padding-bottom: 0 !important; }
+            .feed-input-area { padding-bottom: calc(20px + 75px) !important; }
         }
     </style>
 @endpush
