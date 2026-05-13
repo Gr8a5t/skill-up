@@ -136,7 +136,7 @@
             .m-details h4 { font-size: 1.3rem; }
             
             .stat-widget, .mentor-widget { padding: 20px 15px; width: 100%; box-sizing: border-box; overflow: hidden; }
-            .heatmap-outer { width: 100%; max-width: 100%; overflow-x: auto; display: block; }
+            .heatmap-outer { width: 100%; max-width: 100%; overflow-x: auto; }
             .hero-title { white-space: normal !important; word-break: break-word !important; }
             
             .cw-card { width: 100%; }
