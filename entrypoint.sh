@@ -39,8 +39,9 @@ until php artisan db:monitor || [ $NEXT_WAIT_TIME -eq 5 ]; do
    NEXT_WAIT_TIME=$((NEXT_WAIT_TIME+1))
 done
 
-echo "Running migrations..."
-php artisan migrate --force --no-interaction || echo "Migration failed! Check your DB settings."
+echo "Running fresh migrations..."
+# We use migrate:fresh --force because the first attempt was interrupted and left stale tables
+php artisan migrate:fresh --force --no-interaction || echo "Migration failed! Check your DB settings."
 
 echo "Migration Status:"
 php artisan migrate:status
