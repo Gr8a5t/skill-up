@@ -1,4 +1,4 @@
-<p align="center"><a href="" target="_blank"><img src="public/fitlife-assets/images/readme.png" width="620" alt="Linkcoln"></a></p>
+<p align="center"><a href="" target="_blank"><img src="public/fitlife-assets/images/readme.png" width="650" alt="Linkcoln"></a></p>
 
 ## About SkillUp
 
@@ -18,14 +18,13 @@ SkillUp is a modern, student-centric learning platform designed to bridge the ga
   <img src="https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white" alt="Laravel">
   <img src="https://img.shields.io/badge/Livewire-4e56a6?style=for-the-badge&logo=livewire&logoColor=white" alt="Livewire">
   <img src="https://img.shields.io/badge/Alpine.js-8BC34A?style=for-the-badge&logo=alpinedotjs&logoColor=white" alt="Alpine.js">
-  <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS">
   <img src="https://img.shields.io/badge/SQLite-07405E?style=for-the-badge&logo=sqlite&logoColor=white" alt="SQLite">
   <img src="https://img.shields.io/badge/YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white" alt="YouTube API">
 </p>
 
 - **Framework**: Laravel 11
 - **Real-time**: Livewire 3 & Alpine.js
-- **Styling**: Tailwind CSS & Modern Vanilla CSS
+- **Styling**: Modern Vanilla CSS
 - **Integrations**: YouTube Data API v3
 - **Database**: SQLite
 
@@ -41,40 +40,40 @@ SkillUp is a modern, student-centric learning platform designed to bridge the ga
 ### Installation
 
 1. **Clone the repository**
-   ```bash
-   git clone https://github.com/Gr8a5t/skill-up.git
-   cd skill-up
-   ```
+
+    ```bash
+    git clone https://github.com/Gr8a5t/skill-up.git
+    cd skill-up
+    ```
 
 2. **Install dependencies**
-   ```bash
-   composer install
-   npm install
-   ```
+
+    ```bash
+    composer install
+    npm install
+    ```
 
 3. **Environment Setup**
-   ```bash
-   cp .env.example .env
-   php artisan key:generate
-   ```
-   *Note: Add your `YOUTUBE_API_KEY` to the `.env` file.*
+
+    ```bash
+    cp .env.example .env
+    php artisan key:generate
+    ```
+
+    _Note: Add your `YOUTUBE_API_KEY` to the `.env` file._
 
 4. **Run Migrations**
-   ```bash
-   php artisan migrate --seed
-   ```
+
+    ```bash
+    php artisan migrate --seed
+    ```
 
 5. **Start the Development Server**
-   ```bash
-   npm run dev
-   php artisan serve
-   ```
+    ```bash
+    npm run dev
+    php artisan serve
+    ```
 
 ## Contributing
 
 We welcome contributions! If you'd like to help improve SkillUp, please check out the issues page or submit a pull request.
-
-## License
-
-The SkillUp platform is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-
