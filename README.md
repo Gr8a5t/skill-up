@@ -1,53 +1,71 @@
-<p align="center"><a href="" target="_blank"><img src="public/fitlife-assets/images/readme.png" width="550" alt="Linkcoln"></a></p>
+<p align="center"><a href="" target="_blank"><img src="public/fitlife-assets/images/readme.png" width="620" alt="Linkcoln"></a></p>
 
+## About SkillUp
 
+SkillUp is a modern, student-centric learning platform designed to bridge the gap between amateur practice and professional job-readiness. It focuses on high-impact skills in coding, design, and product thinking through a structured, interactive experience.
 
-## About Laravel
+### Key Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Curated Learning Paths**: From "Coding Fundamentals" to "Product Design Sprints," our paths are built to take learners from zero to portfolio-ready.
+- **Interactive Course Player**: Integrated with YouTube API for real-time progress tracking and persistent learning sessions.
+- **Community-Driven Learning**: Collaborative learning prompts and weekly accountability check-ins through "SkillUp Club."
+- **Mentor Check-ins**: Focused feedback sessions to help translate practice into professional narratives.
+- **Personalized Dashboards**: Track your progress across multiple paths and manage your learning journey in one place.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Technology Stack
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **Framework**: Laravel 11
+- **Real-time**: Livewire & Alpine.js
+- **Styling**: Tailwind CSS & Modern Vanilla CSS
+- **Integrations**: YouTube Data API v3
+- **Database**: MySQL / PostgreSQL
 
-## Learning Laravel
+## Getting Started
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### Prerequisites
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- PHP 8.2+
+- Composer
+- Node.js & NPM
+- YouTube API Key (for course videos)
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+### Installation
 
-## Agentic Development
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/Gr8a5t/skill-up.git
+   cd skill-up
+   ```
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+2. **Install dependencies**
+   ```bash
+   composer install
+   npm install
+   ```
 
-```bash
-composer require laravel/boost --dev
+3. **Environment Setup**
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
+   *Note: Add your `YOUTUBE_API_KEY` to the `.env` file.*
 
-php artisan boost:install
-```
+4. **Run Migrations**
+   ```bash
+   php artisan migrate --seed
+   ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+5. **Start the Development Server**
+   ```bash
+   npm run dev
+   php artisan serve
+   ```
 
 ## Contributing
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+We welcome contributions! If you'd like to help improve SkillUp, please check out the issues page or submit a pull request.
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+The SkillUp platform is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
