@@ -1,4 +1,4 @@
-<p align="center"><a href="skill-up-xbt3.onrender.com" target="_blank"><img src="public/fitlife-assets/images/readme.png" width="650" alt="Linkcoln"></a></p>
+<p align="center"><a href="https://skill-up-xbt3.onrender.com" target="_blank"><img src="public/fitlife-assets/images/readme.png" width="650" alt="Linkcoln"></a></p>
 
 ## About SkillUp
 
