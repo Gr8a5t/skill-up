@@ -14,11 +14,20 @@ SkillUp is a modern, student-centric learning platform designed to bridge the ga
 
 ## Technology Stack
 
+<p align="left">
+  <img src="https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white" alt="Laravel">
+  <img src="https://img.shields.io/badge/Livewire-4e56a6?style=for-the-badge&logo=livewire&logoColor=white" alt="Livewire">
+  <img src="https://img.shields.io/badge/Alpine.js-8BC34A?style=for-the-badge&logo=alpinedotjs&logoColor=white" alt="Alpine.js">
+  <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS">
+  <img src="https://img.shields.io/badge/SQLite-07405E?style=for-the-badge&logo=sqlite&logoColor=white" alt="SQLite">
+  <img src="https://img.shields.io/badge/YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white" alt="YouTube API">
+</p>
+
 - **Framework**: Laravel 11
-- **Real-time**: Livewire & Alpine.js
+- **Real-time**: Livewire 3 & Alpine.js
 - **Styling**: Tailwind CSS & Modern Vanilla CSS
 - **Integrations**: YouTube Data API v3
-- **Database**: MySQL / PostgreSQL
+- **Database**: SQLite
 
 ## Getting Started
 
