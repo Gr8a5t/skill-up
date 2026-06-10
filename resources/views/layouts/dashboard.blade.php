@@ -188,8 +188,10 @@
             sidebarToggleBtn.addEventListener('click', () => {
                 sidebar.classList.toggle('collapsed');
                 if (sidebar.classList.contains('collapsed')) {
+                    layoutWrapper.classList.add('sidebar-collapsed');
                     layoutWrapper.style.paddingLeft = '80px';
                 } else {
+                    layoutWrapper.classList.remove('sidebar-collapsed');
                     layoutWrapper.style.paddingLeft = '260px';
                 }
             });

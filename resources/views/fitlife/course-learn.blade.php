@@ -9,9 +9,10 @@
             --border-color: #edeff1 !important;
         }
         /* Force layout overrides */
-        /* Force layout overrides */
         body { overflow: hidden !important; }
-        body .layout-wrapper { padding-left: 260px !important; margin: 0 !important; width: 100% !important; max-width: none !important; }
+        body .layout-wrapper { margin: 0 !important; width: 100% !important; max-width: none !important; transition: padding-left 0.3s ease !important; }
+        body .layout-wrapper:not(.sidebar-collapsed) { padding-left: 260px !important; }
+        body .layout-wrapper.sidebar-collapsed { padding-left: 80px !important; }
         
         @media (max-width: 992px) { 
             body .layout-wrapper { padding-left: 0 !important; } 
