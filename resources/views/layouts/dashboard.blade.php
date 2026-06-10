@@ -29,27 +29,38 @@
         .layout-wrapper { display: flex; min-height: 100vh; overflow-x: hidden; position: relative; }
         
         /* Sidebar */
-        .sidebar { width: 260px; background: var(--bg-surface); border-right: 1px solid var(--border-color); flex-shrink: 0; display: flex; flex-direction: column; overflow-y: auto; padding-bottom: 24px; scrollbar-width: none; -ms-overflow-style: none; }
+        .sidebar { width: 260px; background: var(--bg-surface); border-right: 1px solid var(--border-color); flex-shrink: 0; display: flex; flex-direction: column; overflow-y: auto; padding-bottom: 24px; scrollbar-width: none; -ms-overflow-style: none; transition: width 0.3s ease; }
         .sidebar::-webkit-scrollbar { display: none; }
-        .sidebar-logo { padding: 30px var(--padding-side); text-decoration: none; display: flex; align-items: center; gap: 10px; font-size: 2rem; font-weight: 800; color: var(--text-main); }
-        .sidebar-logo img { width: 140px; height: auto; }
+        .sidebar-logo { text-decoration: none; display: flex; align-items: center; gap: 10px; font-size: 2rem; font-weight: 800; color: var(--text-main); }
         
         .nav-section { margin-top: 20px; }
-        .nav-title { padding: 0 var(--padding-side); font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-mut); font-weight: 700; margin-bottom: 12px; }
-        .nav-link { display: flex; align-items: center; gap: 14px; padding: 12px var(--padding-side); color: var(--text-mut); text-decoration: none; font-size: 1.4rem; font-weight: 700; transition: 0.2s; border-left: 3px solid transparent; }
+        .nav-title { padding: 0 var(--padding-side); font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-mut); font-weight: 700; margin-bottom: 12px; transition: opacity 0.3s; }
+        .nav-link { display: flex; align-items: center; gap: 14px; padding: 12px var(--padding-side); color: var(--text-mut); text-decoration: none; font-size: 1.4rem; font-weight: 700; transition: 0.2s; border-left: 3px solid transparent; white-space: nowrap; overflow: hidden; }
         .nav-link:hover { color: var(--brand-primary); background: rgba(255, 69, 0, 0.04); }
         .nav-link.active { color: var(--brand-primary); background: rgba(255, 69, 0, 0.08); border-left-color: var(--brand-primary); }
-        .nav-link ion-icon { font-size: 1.8rem; }
+        .nav-link ion-icon { font-size: 2.0rem; flex-shrink: 0; transition: font-size 0.3s ease; }
+        .nav-text { transition: opacity 0.3s; }
         
         .sidebar-bottom { margin-top: auto; padding-top: 20px; border-top: 1px solid var(--border-color); margin-top: 30px; }
         
         /* Friends list common */
         .friends-list { padding: 0 var(--padding-side); display: flex; flex-direction: column; gap: 16px; }
-        .friend-item { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-        .friend-avatar { width: 36px; height: 36px; border-radius: 50%; background: #e0e9f8; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #1c1c1c; font-size: 1.2rem; flex-shrink: 0; }
-        .friend-info { display: flex; flex-direction: column; }
+        .friend-item { display: flex; align-items: center; gap: 12px; text-decoration: none; overflow: hidden; }
+        .friend-avatar { width: 40px; height: 40px; border-radius: 50%; background: #e0e9f8; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #1c1c1c; font-size: 1.3rem; flex-shrink: 0; }
+        .friend-info { display: flex; flex-direction: column; white-space: nowrap; transition: opacity 0.3s; }
         .friend-name { font-size: 1.3rem; font-weight: 700; color: var(--text-main); }
         .friend-role { font-size: 1.1rem; color: var(--text-mut); }
+
+        /* Collapsed Sidebar Styles */
+        .sidebar.collapsed { width: 80px; }
+        .sidebar.collapsed .sidebar-logo-img { display: none; }
+        .sidebar.collapsed .nav-title { opacity: 0; height: 0; overflow: hidden; margin: 0; padding: 0; }
+        .sidebar.collapsed .nav-text { opacity: 0; width: 0; }
+        .sidebar.collapsed .friend-info { opacity: 0; width: 0; }
+        .sidebar.collapsed .nav-link { justify-content: center; padding: 14px 0; }
+        .sidebar.collapsed .nav-link ion-icon { font-size: 2.4rem; }
+        .sidebar.collapsed .friends-list { align-items: center; padding: 0; }
+        .layout-wrapper { display: flex; min-height: 100vh; overflow-x: hidden; position: relative; transition: padding-left 0.3s ease; }
  
         /* Main Content */
         .main-col { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; position: relative; }
@@ -157,6 +168,9 @@
         const overlay = document.getElementById('sidebarOverlay');
         const mobileMoreBtn = document.getElementById('mobileMoreBtn');
 
+        const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
+        const layoutWrapper = document.querySelector('.layout-wrapper');
+
         const openSidebar = () => {
             sidebar.classList.add('open');
             overlay.classList.add('active');
@@ -169,6 +183,17 @@
 
         if (mobileMoreBtn) mobileMoreBtn.addEventListener('click', openSidebar);
         if (overlay) overlay.addEventListener('click', closeSidebar);
+        
+        if (sidebarToggleBtn) {
+            sidebarToggleBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('collapsed');
+                if (sidebar.classList.contains('collapsed')) {
+                    layoutWrapper.style.paddingLeft = '80px';
+                } else {
+                    layoutWrapper.style.paddingLeft = '260px';
+                }
+            });
+        }
     </script>
     @livewireScripts
     @stack('scripts')

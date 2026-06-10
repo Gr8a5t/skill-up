@@ -605,6 +605,6 @@ class FitlifeController extends Controller
 
     public function forum()
     {
-        return view('fitlife.forum', ['noTopbar' => true, 'noSidebar' => true]);
+        return view('fitlife.forum');
     }
 }
