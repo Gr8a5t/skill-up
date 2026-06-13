@@ -185,7 +185,7 @@
                 <div class="action-row">
                     <button class="icon-btn"><ion-icon name="bookmark-outline"></ion-icon></button>
                     <button class="share-btn" onclick="shareCourse()"><ion-icon name="share-social-outline"></ion-icon> Share</button>
-                    <img src="{{ asset('fitlife-assets/images/ai-icon.png') }}" style="width: 44px; height: 44px; border-radius: 10px; margin-left: 10px;" alt="Instructor">
+                    <img src="{{ asset('fitlife-assets/images/ai-icon.png') }}" onclick="Livewire.dispatch('toggleAiChat')" style="width: 44px; height: 44px; border-radius: 10px; margin-left: 10px; cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" alt="AI Tutor" title="Ask AI Tutor">
                 </div>
             </header>
 
@@ -318,6 +318,10 @@
             </div>
         </div>
     </div>
+
+    <!-- AI Chat Offcanvas Component -->
+    @livewire('course-ai-chat', ['course' => $course])
+
 @push('scripts')
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
