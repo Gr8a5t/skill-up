@@ -74,22 +74,36 @@
                 x-data="{ 
                     swiped: false, 
                     startX: 0, 
+                    startY: 0,
                     currentX: 0,
+                    isScrolling: false,
                     isMe: {{ $m->sender_id === auth()->id() ? 'true' : 'false' }},
                     canEdit: {{ $m->sender_id === auth()->id() && $m->created_at->diffInMinutes() < 5 ? 'true' : 'false' }},
                     handleTouchStart(e) {
                         if (!this.isMe) return;
                         this.startX = e.touches[0].clientX;
+                        this.startY = e.touches[0].clientY;
+                        this.isScrolling = false;
                     },
                     handleTouchMove(e) {
-                        if (!this.isMe) return;
-                        let diff = e.touches[0].clientX - this.startX;
-                        if (diff < 0 && diff > -100) {
-                            this.currentX = diff;
+                        if (!this.isMe || this.isScrolling) return;
+                        
+                        let diffX = e.touches[0].clientX - this.startX;
+                        let diffY = e.touches[0].clientY - this.startY;
+                        
+                        // If vertical scroll is stronger than horizontal, ignore the swipe
+                        if (Math.abs(diffY) > Math.abs(diffX)) {
+                            this.isScrolling = true;
+                            this.currentX = 0;
+                            return;
+                        }
+                        
+                        if (diffX < 0 && diffX > -100) {
+                            this.currentX = diffX;
                         }
                     },
                     handleTouchEnd() {
-                        if (!this.isMe) return;
+                        if (!this.isMe || this.isScrolling) return;
                         if (this.currentX < -50) {
                             this.swiped = true;
                             this.currentX = -80;
@@ -189,7 +203,7 @@
         /* Auto-scroll helper */
         #chat-feed { scroll-behavior: smooth; }
 
-        .msg-wrapper { position: relative; margin-bottom: 8px; display: flex; flex-direction: column; width: 100%; overflow: hidden; padding-bottom: 4px; }
+        .msg-wrapper { position: relative; margin-bottom: 8px; display: flex; flex-direction: column; width: 100%; overflow: visible; }
         
         .msg-actions { 
             position: absolute; top: 0; bottom: 0; 

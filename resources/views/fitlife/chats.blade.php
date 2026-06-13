@@ -41,7 +41,7 @@
         .feed-status { font-size: 1.1rem; color: #23a55a; font-weight: 500; display: flex; align-items: center; gap: 4px; }
         .status-dot { width: 8px; height: 8px; background: #23a55a; border-radius: 50%; }
         
-        .feed-content { flex-grow: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+        .feed-content { flex-grow: 1; overflow-y: auto; overflow-x: hidden; padding: 24px; display: flex; flex-direction: column; gap: 16px; }
         .msg-line { display: flex; flex-direction: column; max-width: 75%; }
         .msg-line.me { align-self: flex-end; align-items: flex-end; }
         .msg-line.other { align-self: flex-start; align-items: flex-start; }

@@ -132,13 +132,17 @@ class ChatComponent extends Component
     {
         $userId = auth()->id();
 
-        // Subquery to get the latest message for each user interaction
-        $latestMessages = ChatMessage::where('sender_id', $userId)
-            ->orWhere('recipient_id', $userId)
-            ->select('id', DB::raw('CASE WHEN "sender_id" = ' . $userId . ' THEN "recipient_id" ELSE "sender_id" END as contact_id'), 'created_at', 'message', 'is_read', 'sender_id')
-            ->orderBy('created_at', 'desc')
-            ->get()
-            ->unique('contact_id');
+        // Fetch only the latest message ID per contact at the database level
+        $latestMessages = ChatMessage::whereIn('id', function ($query) use ($userId) {
+            $query->select(DB::raw('MAX(id)'))
+                ->from('chat_messages')
+                ->where('sender_id', $userId)
+                ->orWhere('recipient_id', $userId)
+                ->groupBy(DB::raw('CASE WHEN sender_id = ' . $userId . ' THEN recipient_id ELSE sender_id END'));
+        })
+        ->select('id', DB::raw('CASE WHEN sender_id = ' . $userId . ' THEN recipient_id ELSE sender_id END as contact_id'), 'created_at', 'message', 'is_read', 'sender_id')
+        ->orderBy('created_at', 'desc')
+        ->get();
 
         $conversations = [];
         foreach ($latestMessages as $msg) {

@@ -20,10 +20,10 @@
                     </div>
                 </div>
 
-                <!-- Name & Title -->
+                <!-- Name & Title / Bio -->
                 <h1 style="font-size: 3.5rem; font-weight: 700; color: #1c1c1c; margin-bottom: 8px; letter-spacing: -1px;">{{ $user->name }}</h1>
-                <p style="font-size: 1.8rem; color: #666; font-weight: 500; margin-bottom: 30px;">
-                    {{ $user->title ?? 'SkillUp User' }}
+                <p style="font-size: 1.8rem; color: #666; font-weight: 500; margin-bottom: 30px; line-height: 1.5; white-space: pre-line;">
+                    {{ $user->bio ?? 'SkillUp User' }}
                 </p>
 
                 <!-- Actions -->
