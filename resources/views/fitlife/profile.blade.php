@@ -82,9 +82,8 @@
             <div style="background: #fdfdfd; border-radius: 16px; padding: 80px 40px; text-align: center; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid #f0f0f0;">
                 <h2 style="font-size: 2.2rem; font-weight: 700; color: #1c1c1c; margin-bottom: 12px;">Feature your work</h2>
                 <p style="font-size: 1.5rem; color: #666; margin-bottom: 30px;">Share quick snapshots of what you've been working on.</p>
-                <div style="display: flex; gap: 15px; justify-content: center;">
-                    <button style="background: #1c1c28; color: #fff; border: none; padding: 12px 30px; border-radius: 30px; font-weight: 600; font-size: 1.4rem; cursor: pointer;">Add work</button>
-                    <button style="background: #fff; color: #1c1c28; border: 1px solid #eaeaea; padding: 12px 30px; border-radius: 30px; font-weight: 600; font-size: 1.4rem; cursor: pointer;">Get inspired</button>
+                <div style="display: flex; justify-content: center;">
+                    <button onclick="openWorkModal()" style="background: #1c1c28; color: #fff; border: none; padding: 12px 30px; border-radius: 30px; font-weight: 600; font-size: 1.4rem; cursor: pointer;">Add work</button>
                 </div>
             </div>
         </div>
@@ -291,6 +290,35 @@
     </div>
 </div>
 
+<!-- Add Work Modal -->
+<div id="workModalOverlay" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 1050; align-items: center; justify-content: center; backdrop-filter: blur(2px);">
+    <div style="background: #fff; width: 90%; max-width: 650px; border-radius: 20px; padding: 25px 30px; position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.1);">
+        
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 30px;">
+            <div style="display: flex; align-items: center; gap: 15px; flex-grow: 1;">
+                <img src="{{ $user->avatar ?? 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&size=150&background=ff4500&color=fff' }}" alt="{{ $user->name }}" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover;">
+                <input type="text" placeholder="Tell us a bit about this work" style="border: none; outline: none; font-size: 1.8rem; color: #1c1c1c; font-weight: 500; width: 100%; background: transparent;" />
+            </div>
+            <button onclick="closeWorkModal()" style="background: transparent; border: none; font-size: 2.8rem; color: #444; cursor: pointer; display: flex; align-items: center; justify-content: center; margin-left: 15px;">
+                <ion-icon name="close-outline"></ion-icon>
+            </button>
+        </div>
+
+        <div style="border: 1px solid #eaeaea; border-radius: 12px; padding: 60px 20px; text-align: center; background: #fafafa; margin-bottom: 30px; cursor: pointer; transition: 0.2s;" onmouseover="this.style.borderColor='#ccc'" onmouseout="this.style.borderColor='#eaeaea'">
+            <ion-icon name="image-outline" style="font-size: 3.5rem; color: #bbb; margin-bottom: 15px;"></ion-icon>
+            <h3 style="font-size: 1.6rem; font-weight: 600; color: #1c1c1c; margin-bottom: 10px;">Share visuals from a recent project</h3>
+            <p style="font-size: 1.4rem; color: #888;">Drop a file or <span style="text-decoration: underline; color: #444; font-weight: 600;">Browse</span></p>
+        </div>
+
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+            <button style="background: transparent; border: none; font-size: 2.4rem; color: #666; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s;" onmouseover="this.style.color='#1c1c28'" onmouseout="this.style.color='#666'">
+                <ion-icon name="happy-outline"></ion-icon>
+            </button>
+            <button style="background: #1c1c28; color: #fff; border: none; padding: 12px 35px; border-radius: 30px; font-weight: 600; font-size: 1.5rem; cursor: pointer; transition: 0.2s;">Next</button>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @push('styles')
@@ -421,6 +449,14 @@
             if(displayWrapper) displayWrapper.style.display = 'block';
             editWrapper.style.display = 'none';
         }
+    }
+
+    function openWorkModal() {
+        document.getElementById('workModalOverlay').style.display = 'flex';
+    }
+
+    function closeWorkModal() {
+        document.getElementById('workModalOverlay').style.display = 'none';
     }
 </script>
 @endpush
