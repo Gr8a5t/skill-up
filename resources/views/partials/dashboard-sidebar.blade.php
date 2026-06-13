@@ -17,22 +17,25 @@
     </div>
     
     <div class="nav-section">
-        <div class="nav-title">Friends</div>
+        <div class="nav-title">Followers</div>
         <div class="friends-list">
-            <a href="#" class="friend-item">
-                <div class="friend-avatar">BM</div>
-                <div class="friend-info">
-                    <span class="friend-name">Bagas Mahpie</span>
-                    <span class="friend-role">Friend</span>
-                </div>
-            </a>
-            <a href="#" class="friend-item">
-                <div class="friend-avatar">SD</div>
-                <div class="friend-info">
-                    <span class="friend-name">Sir Dandy</span>
-                    <span class="friend-role">Old Friend</span>
-                </div>
-            </a>
+            @if(auth()->check() && auth()->user()->followers()->count() > 0)
+                @foreach(auth()->user()->followers()->take(5)->get() as $follower)
+                <a href="{{ route('profile', $follower) }}" class="friend-item">
+                    @if($follower->avatar)
+                        <img src="{{ $follower->avatar }}" class="friend-avatar" style="object-fit: cover;">
+                    @else
+                        <div class="friend-avatar" style="display: flex; align-items: center; justify-content: center; background: var(--brand-primary); color: white; font-weight: bold;">{{ substr($follower->name, 0, 2) }}</div>
+                    @endif
+                    <div class="friend-info">
+                        <span class="friend-name">{{ $follower->name }}</span>
+                        <span class="friend-role">Follower</span>
+                    </div>
+                </a>
+                @endforeach
+            @else
+                <p style="padding: 0 var(--padding-side); color: var(--text-mut); font-size: 1.2rem;">No followers yet.</p>
+            @endif
         </div>
     </div>
     
