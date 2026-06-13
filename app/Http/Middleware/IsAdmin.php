@@ -18,7 +18,6 @@ class IsAdmin
         if (auth()->check() && auth()->user()->is_admin) {
             return $next($request);
         }
-
-        abort(404);
+        throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException();
     }
 }
