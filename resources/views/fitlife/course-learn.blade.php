@@ -15,7 +15,9 @@
         body .layout-wrapper.sidebar-collapsed { padding-left: 80px !important; }
         
         @media (max-width: 992px) { 
-            body .layout-wrapper { padding-left: 0 !important; } 
+            body .layout-wrapper,
+            body .layout-wrapper:not(.sidebar-collapsed),
+            body .layout-wrapper.sidebar-collapsed { padding-left: 0 !important; } 
         }
 
         /* Kill the red scrollbar / Hide all scrollbars while maintaining scroll functionality */

@@ -1,11 +1,11 @@
 <div>
     <!-- Offcanvas Overlay -->
     @if($isOpen)
-        <div class="chat-overlay" wire:click="toggleChat" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.4); z-index: 100;"></div>
+        <div class="chat-overlay" wire:click="toggleChat" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.4); z-index: 1050;"></div>
     @endif
 
     <!-- Offcanvas Panel -->
-    <div class="ai-chat-panel {{ $isOpen ? 'open' : '' }}" style="position: fixed; top: 0; right: -400px; width: 400px; height: 100vh; background: #fff; z-index: 101; box-shadow: -4px 0 15px rgba(0,0,0,0.1); transition: right 0.3s ease; display: flex; flex-direction: column;">
+    <div class="ai-chat-panel {{ $isOpen ? 'open' : '' }}" style="position: fixed; top: 0; right: -400px; width: 400px; height: 100vh; background: #fff; z-index: 1051; box-shadow: -4px 0 15px rgba(0,0,0,0.1); transition: right 0.3s ease; display: flex; flex-direction: column;">
         
         <!-- Header -->
         <div style="padding: 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; background: #fafafa;">
