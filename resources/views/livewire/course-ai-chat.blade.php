@@ -27,14 +27,18 @@
                     @if($msg['role'] === 'assistant')
                         <img src="{{ asset('fitlife-assets/images/ai-icon.png') }}" style="width: 32px; height: 32px; border-radius: 6px; flex-shrink: 0;" alt="AI">
                     @else
-                        <div style="width: 32px; height: 32px; background: var(--brand-primary); border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: #fff;">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                        </div>
+                        @if(auth()->check() && auth()->user()->avatar)
+                            <img src="{{ auth()->user()->avatar }}" style="width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0; object-fit: cover;" alt="User">
+                        @else
+                            <div style="width: 32px; height: 32px; background: var(--brand-primary); border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.2rem; font-weight: bold;">
+                                {{ auth()->check() ? substr(auth()->user()->name, 0, 1) : 'U' }}
+                            </div>
+                        @endif
                     @endif
 
                     <!-- Bubble -->
-                    <div style="max-width: 75%; padding: 12px 16px; border-radius: 12px; font-size: 1.3rem; line-height: 1.5; {{ $msg['role'] === 'user' ? 'background: var(--brand-primary); color: #fff; border-bottom-right-radius: 2px;' : 'background: #f0f2f5; color: #1c1c1c; border-bottom-left-radius: 2px;' }}">
-                        {{ $msg['content'] }}
+                    <div class="chat-bubble {{ $msg['role'] }}" style="max-width: 75%; padding: 12px 16px; border-radius: 12px; font-size: 1.3rem; line-height: 1.5; {{ $msg['role'] === 'user' ? 'background: var(--brand-primary); color: #fff; border-bottom-right-radius: 2px;' : 'background: #f0f2f5; color: #1c1c1c; border-bottom-left-radius: 2px; overflow-wrap: anywhere;' }}">
+                        {!! Str::markdown($msg['content']) !!}
                     </div>
                 </div>
             @endforeach
@@ -61,15 +65,33 @@
     <style>
         .ai-chat-panel.open { right: 0 !important; }
         @media (max-width: 500px) { .ai-chat-panel { width: 100% !important; right: -100% !important; } }
+        
+        .chat-bubble p { margin-bottom: 8px; }
+        .chat-bubble p:last-child { margin-bottom: 0; }
+        .chat-bubble a { color: inherit; text-decoration: underline; font-weight: 600; transition: opacity 0.2s; }
+        .chat-bubble a:hover { opacity: 0.8; }
+        .chat-bubble ul, .chat-bubble ol { margin-bottom: 8px; padding-left: 20px; }
+        .chat-bubble ul:last-child, .chat-bubble ol:last-child { margin-bottom: 0; }
+        .chat-bubble strong { font-weight: 700; }
     </style>
     
     <script>
         document.addEventListener('livewire:initialized', () => {
-            Livewire.hook('morph.updated', ({ component, el }) => {
-                const chatBox = document.getElementById('chatMessagesBox');
-                if (chatBox) {
-                    chatBox.scrollTop = chatBox.scrollHeight;
-                }
+            Livewire.on('chat-updated', () => {
+                // Use a short timeout to let the DOM morph finish first
+                setTimeout(() => {
+                    const chatBox = document.getElementById('chatMessagesBox');
+                    if (chatBox) {
+                        chatBox.scrollTop = chatBox.scrollHeight;
+                        
+                        // Force all links in the chat to open in a new tab
+                        const links = chatBox.querySelectorAll('.chat-bubble a');
+                        links.forEach(link => {
+                            link.setAttribute('target', '_blank');
+                            link.setAttribute('rel', 'noopener noreferrer');
+                        });
+                    }
+                }, 50);
             });
         });
     </script>

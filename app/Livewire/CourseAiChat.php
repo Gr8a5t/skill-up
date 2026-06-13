@@ -29,6 +29,7 @@ class CourseAiChat extends Component
                                "Your only job is to answer questions related to this specific course and its concepts. " .
                                "If a user asks a question entirely unrelated to the course topic, politely decline to answer, " .
                                "stating that you are here specifically to help with '{$title}'. " .
+                               "IMPORTANT: If you provide any websites or URLs, you MUST format them as valid clickable markdown links (e.g., [Website Name](https://example.com)). " .
                                "Keep your answers concise, helpful, and educational.";
 
         $this->messages[] = [
@@ -40,6 +41,9 @@ class CourseAiChat extends Component
     public function toggleChat()
     {
         $this->isOpen = !$this->isOpen;
+        if($this->isOpen) {
+            $this->dispatch('chat-updated');
+        }
     }
 
     public function sendMessage()
@@ -56,6 +60,7 @@ class CourseAiChat extends Component
         ];
         
         $this->newMessage = '';
+        $this->dispatch('chat-updated');
 
         $this->callGeminiApi();
     }
@@ -69,6 +74,7 @@ class CourseAiChat extends Component
                 'role' => 'assistant',
                 'content' => "Error: Gemini API key is not configured in .env (GEMINI_API_KEY)."
             ];
+            $this->dispatch('chat-updated');
             return;
         }
 
@@ -125,6 +131,8 @@ class CourseAiChat extends Component
                 'content' => "Sorry, an error occurred while processing your request."
             ];
         }
+        
+        $this->dispatch('chat-updated');
     }
 
     public function render()
