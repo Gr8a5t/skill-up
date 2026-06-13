@@ -189,7 +189,7 @@
         /* Auto-scroll helper */
         #chat-feed { scroll-behavior: smooth; }
 
-        .msg-wrapper { position: relative; margin-bottom: 8px; display: flex; flex-direction: column; width: 100%; overflow: hidden; }
+        .msg-wrapper { position: relative; margin-bottom: 8px; display: flex; flex-direction: column; width: 100%; overflow: hidden; padding-bottom: 4px; }
         
         .msg-actions { 
             position: absolute; top: 0; bottom: 0; 

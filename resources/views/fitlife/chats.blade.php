@@ -4,11 +4,10 @@
 
 @push('styles')
     <style>
-        /* Override content-area for full bleed chat split */
-        .content-area { padding: 0 !important; height: calc(100vh - 80px); overflow: hidden; background: #fff; }
-        body { background: #fff !important; }
+        /* Full bleed chat split */
+        body { background: #fff !important; overflow: hidden !important; }
         
-        .chat-layout { display: flex; height: 100%; background: #fff; }
+        .chat-layout { display: flex; height: calc(100vh - 80px); background: #fff; overflow: hidden; }
         
         /* Left Column: Conversation List */
         .chat-side { width: 360px; border-right: 1px solid var(--border-color); display: flex; flex-direction: column; flex-shrink: 0; background: #fff; z-index: 10; }
@@ -59,7 +58,7 @@
         .feed-btn { background: none; border: none; font-size: 2.2rem; cursor: pointer; color: var(--brand-primary); display: flex; align-items: center; justify-content: center; transition: 0.2s; }
 
         @media (max-width: 992px) {
-            .content-area { height: calc(100vh - 80px); } 
+            .chat-layout { height: calc(100vh - 80px); } 
             body { padding-bottom: 0 !important; }
             .feed-input-area { padding-bottom: calc(20px + 75px) !important; }
         }
