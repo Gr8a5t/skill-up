@@ -374,29 +374,9 @@ class FitlifeController extends Controller
 
     public function paths()
     {
-        $paths = $this->skillUpPaths();
-
-        // If we want to show real progress from DB
-        $sessionId = session()->getId();
-        $userId = auth()->id();
-
-        foreach ($paths as &$path) {
-            $completedCount = DB::table('user_path_progress')
-                ->where('path_slug', $path['slug'])
-                ->where(function($q) use ($userId, $sessionId) {
-                    if ($userId) $q->where('user_id', $userId);
-                    else $q->where('session_id', $sessionId);
-                })
-                ->count();
-
-            $totalModules = count($path['modules']);
-            if ($totalModules > 0) {
-                $path['progress'] = round(($completedCount / $totalModules) * 100);
-            }
-        }
-
+        // The paths feature is currently under development.
+        // It returns a coming soon page without querying the database.
         return view('fitlife.paths', [
-            'paths' => $paths,
             'noTopbar' => true,
             'noSidebar' => true
         ]);
