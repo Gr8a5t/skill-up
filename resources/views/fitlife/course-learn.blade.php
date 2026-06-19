@@ -185,7 +185,7 @@
             <header class="course-header">
                 <h1 class="course-title">{{ $course['title'] }}</h1>
                 <div class="action-row">
-                    <button class="icon-btn"><ion-icon name="bookmark-outline"></ion-icon></button>
+                    <button class="icon-btn"><ion-icon name="code-slash-outline"></ion-icon></button>
                     <button class="share-btn" onclick="shareCourse()"><ion-icon name="share-social-outline"></ion-icon> Share</button>
                     <img src="{{ asset('fitlife-assets/images/ai-icon.png') }}" onclick="Livewire.dispatch('toggleAiChat')" style="width: 44px; height: 44px; border-radius: 10px; margin-left: 10px; cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" alt="AI Tutor" title="Ask AI Tutor">
                 </div>
