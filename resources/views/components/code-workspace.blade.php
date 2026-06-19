@@ -127,17 +127,62 @@
         background: #1e1e1e;
         position: relative;
         overflow: hidden;
-        display: flex; /* For VS Code Sidebar + Main */
+        display: flex;
+        min-width: 0; /* Prevent flex children from overflowing grid */
     }
 
     /* VS Code Sidebar Styles */
     .vscode-sidebar {
         width: 220px;
-        background: #181818; /* Darker than editor */
+        background: #181818;
         border-right: 1px solid #2d2d2d;
         display: flex;
         flex-direction: column;
         flex-shrink: 0;
+        transition: width 0.2s ease;
+        overflow: hidden;
+    }
+
+    .vscode-sidebar.collapsed {
+        width: 0;
+        border-right: none;
+    }
+
+    /* VS Code Activity Bar (icon strip) */
+    .vscode-activity-bar {
+        width: 48px;
+        background: #181818;
+        border-right: 1px solid #2d2d2d;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding-top: 8px;
+        gap: 4px;
+        flex-shrink: 0;
+    }
+
+    .activity-bar-icon {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #858585;
+        font-size: 1.5rem;
+        cursor: pointer;
+        border-radius: 6px;
+        border-left: 2px solid transparent;
+        transition: all 0.15s;
+    }
+
+    .activity-bar-icon:hover {
+        color: #fff;
+    }
+
+    .activity-bar-icon.active {
+        color: #fff;
+        border-left-color: #ff4500;
+        background: rgba(255, 69, 0, 0.08);
     }
 
     .sidebar-section {
@@ -153,6 +198,27 @@
         font-size: 0.85rem;
         font-weight: 700;
         letter-spacing: 0.5px;
+        white-space: nowrap;
+    }
+
+    .sidebar-header-actions {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+    }
+
+    .sidebar-header-actions ion-icon {
+        font-size: 1.15rem;
+        color: #888;
+        cursor: pointer;
+        padding: 3px;
+        border-radius: 4px;
+        transition: all 0.15s;
+    }
+
+    .sidebar-header-actions ion-icon:hover {
+        color: #fff;
+        background: rgba(255,255,255,0.08);
     }
 
     .sidebar-actions {
@@ -204,6 +270,7 @@
         flex-direction: column;
         overflow: hidden;
         background: #1e1e1e;
+        min-width: 0; /* Critical: prevents Monaco from overflowing */
     }
 
     .vscode-tabs,
@@ -251,9 +318,9 @@
     .vscode-editor-container,
     .editor-container {
         flex: 1;
-        width: 100%;
-        min-height: 0;
         position: relative;
+        min-height: 0;
+        min-width: 0;
     }
 
     /* Console Styles */
@@ -362,9 +429,33 @@
         <div class="v-resizer" id="v-resizer" @mousedown="startResizeV($event)" :class="{ 'dragging': isResizingV }"></div>
         
         <div class="workspace-editor-area" id="workspace-editor-area">
+            <!-- VS Code Activity Bar -->
+            <div class="vscode-activity-bar">
+                <div class="activity-bar-icon" :class="{ 'active': !sidebarCollapsed }" @click="sidebarCollapsed = !sidebarCollapsed" title="Toggle Explorer">
+                    <ion-icon name="copy-outline"></ion-icon>
+                </div>
+                <div class="activity-bar-icon" title="Search">
+                    <ion-icon name="search-outline"></ion-icon>
+                </div>
+                <div class="activity-bar-icon" title="Source Control">
+                    <ion-icon name="git-branch-outline"></ion-icon>
+                </div>
+                <div class="activity-bar-icon" title="Extensions">
+                    <ion-icon name="extension-puzzle-outline"></ion-icon>
+                </div>
+            </div>
+
             <!-- VS Code Sidebar -->
-            <div class="vscode-sidebar">
-                <div class="sidebar-header">EXPLORER</div>
+            <div class="vscode-sidebar" :class="{ 'collapsed': sidebarCollapsed }">
+                <div class="sidebar-header">
+                    <span>EXPLORER</span>
+                    <div class="sidebar-header-actions">
+                        <ion-icon name="document-outline" title="New File"></ion-icon>
+                        <ion-icon name="folder-outline" title="New Folder"></ion-icon>
+                        <ion-icon name="refresh-outline" title="Refresh"></ion-icon>
+                        <ion-icon name="ellipsis-horizontal" title="More Actions"></ion-icon>
+                    </div>
+                </div>
                 <div class="sidebar-files">
                     <div class="file-item active">
                         <ion-icon name="logo-html5" style="color: #e34f26;"></ion-icon> index.html
@@ -376,7 +467,9 @@
                         <ion-icon name="logo-javascript" style="color: #f7df1e;"></ion-icon> script.js
                     </div>
                     
-                    <div class="sidebar-header" style="margin-top: 20px;">DEPENDENCIES</div>
+                    <div class="sidebar-header" style="margin-top: 20px;">
+                        <span>DEPENDENCIES</span>
+                    </div>
                     <div class="file-item">
                         <ion-icon name="cube-outline"></ion-icon> package.json
                     </div>
@@ -390,8 +483,8 @@
                         <ion-icon name="logo-html5" style="color: #e34f26;"></ion-icon> index.html
                     </div>
                 </div>
-                <div class="editor-container" id="monaco-editor-container">
-                    <!-- Monaco Editor injected here -->
+                <div class="editor-container">
+                    <div id="monaco-editor-container" style="position:absolute;top:0;left:0;right:0;bottom:0;"></div>
                 </div>
             </div>
         </div>
@@ -429,6 +522,7 @@ document.addEventListener('alpine:init', () => {
         isOpen: false,
         isResizingV: false,
         isResizingH: false,
+        sidebarCollapsed: false,
 
         open() {
             const playerEl = document.getElementById('player');
