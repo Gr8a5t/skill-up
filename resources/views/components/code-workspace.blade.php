@@ -64,23 +64,53 @@
     .workspace-grid {
         flex: 1;
         display: grid;
-        grid-template-columns: 50% 50%;
-        grid-template-rows: 70% 30%;
+        grid-template-columns: var(--video-width, calc(50% - 2px)) 4px 1fr;
+        grid-template-rows: 1fr 4px var(--console-height, calc(30% - 2px));
         grid-template-areas: 
-            "video editor"
-            "console console";
+            "video v-resizer editor"
+            "h-resizer h-resizer h-resizer"
+            "console console console";
         height: calc(100vh - 50px);
+        overflow: hidden;
+    }
+
+    /* Prevent iframe from eating mouse events while dragging */
+    .workspace-grid.is-dragging iframe {
+        pointer-events: none;
+    }
+
+    .v-resizer {
+        grid-area: v-resizer;
+        background: #333;
+        cursor: col-resize;
+        transition: background 0.2s;
+        z-index: 10;
+    }
+    
+    .v-resizer:hover, .v-resizer.dragging {
+        background: #ff4500;
+    }
+
+    .h-resizer {
+        grid-area: h-resizer;
+        background: #333;
+        cursor: row-resize;
+        transition: background 0.2s;
+        z-index: 10;
+    }
+
+    .h-resizer:hover, .h-resizer.dragging {
+        background: #ff4500;
     }
 
     .workspace-video-area {
         grid-area: video;
         background: #000;
-        border-right: 1px solid #333;
-        border-bottom: 1px solid #333;
         display: flex;
         align-items: center;
         justify-content: center;
         position: relative;
+        overflow: hidden;
     }
 
     .workspace-video-area #player {
@@ -91,8 +121,8 @@
     .workspace-editor-area {
         grid-area: editor;
         background: #1e1e1e;
-        border-bottom: 1px solid #333;
         position: relative;
+        overflow: hidden;
     }
 
     .workspace-console-area {
@@ -100,6 +130,7 @@
         background: #1e1e1e;
         display: flex;
         flex-direction: column;
+        overflow: hidden;
     }
 
     .console-header {
@@ -113,6 +144,7 @@
         color: #ccc;
         font-size: 0.9rem;
         font-weight: 600;
+        flex-shrink: 0;
     }
 
     .clear-console-btn {
@@ -160,13 +192,21 @@
             </button>
         </div>
     </div>
-    <div class="workspace-grid">
+    <div class="workspace-grid" id="workspace-grid">
         <div class="workspace-video-area" id="workspace-video-container">
             <!-- Video iframe moves here dynamically -->
         </div>
-        <div class="workspace-editor-area">
+        
+        <!-- Vertical Resizer -->
+        <div class="v-resizer" id="v-resizer"></div>
+        
+        <div class="workspace-editor-area" id="workspace-editor-area">
             <div id="monaco-editor-container" style="width: 100%; height: 100%;"></div>
         </div>
+        
+        <!-- Horizontal Resizer -->
+        <div class="h-resizer" id="h-resizer"></div>
+        
         <div class="workspace-console-area">
             <div class="console-header">
                 <span>Output / Console</span>
@@ -204,6 +244,17 @@
                 fontSize: 14,
                 fontFamily: "'Fira Code', 'Courier New', monospace"
             });
+            
+            // Re-layout when container size changes
+            const editorArea = document.getElementById('workspace-editor-area');
+            if (window.ResizeObserver) {
+                const ro = new ResizeObserver(() => {
+                    if(window.monacoEditor) {
+                        window.monacoEditor.layout();
+                    }
+                });
+                ro.observe(editorArea);
+            }
         });
 
         // Toggle logic
@@ -223,6 +274,11 @@
                 
                 workspaceEl.classList.add('active');
                 document.body.style.overflow = 'hidden'; // prevent background scrolling
+                
+                // Force layout update on open
+                if(window.monacoEditor) {
+                    setTimeout(() => window.monacoEditor.layout(), 100);
+                }
             });
         }
 
@@ -244,6 +300,59 @@
             const consoleOutput = document.getElementById('console-output');
             if(consoleOutput) {
                 consoleOutput.innerHTML = '<div class="console-line">>> Console cleared.</div>';
+            }
+        });
+
+        // Resizer Logic
+        const grid = document.getElementById('workspace-grid');
+        const vResizer = document.getElementById('v-resizer');
+        const hResizer = document.getElementById('h-resizer');
+
+        let isResizingV = false;
+        let isResizingH = false;
+
+        vResizer.addEventListener('mousedown', (e) => {
+            isResizingV = true;
+            grid.classList.add('is-dragging');
+            vResizer.classList.add('dragging');
+            e.preventDefault();
+        });
+
+        hResizer.addEventListener('mousedown', (e) => {
+            isResizingH = true;
+            grid.classList.add('is-dragging');
+            hResizer.classList.add('dragging');
+            e.preventDefault();
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isResizingV && !isResizingH) return;
+            
+            if (isResizingV) {
+                const newWidth = (e.clientX / window.innerWidth) * 100;
+                if (newWidth > 15 && newWidth < 85) { // min/max bounds
+                    grid.style.setProperty('--video-width', `calc(${newWidth}% - 2px)`);
+                }
+            }
+            
+            if (isResizingH) {
+                const headerHeight = 50; // .workspace-header height
+                const gridHeight = window.innerHeight - headerHeight;
+                const newHeight = ((window.innerHeight - e.clientY) / gridHeight) * 100;
+                
+                if (newHeight > 10 && newHeight < 80) { // min/max bounds
+                    grid.style.setProperty('--console-height', `calc(${newHeight}% - 2px)`);
+                }
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (isResizingV || isResizingH) {
+                isResizingV = false;
+                isResizingH = false;
+                grid.classList.remove('is-dragging');
+                vResizer.classList.remove('dragging');
+                hResizer.classList.remove('dragging');
             }
         });
     });
