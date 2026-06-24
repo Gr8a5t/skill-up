@@ -128,12 +128,14 @@
         position: relative;
         overflow: hidden;
         display: flex;
-        min-width: 0; /* Prevent flex children from overflowing grid */
+        min-width: 0;
+        height: 100%;
     }
 
     /* VS Code Sidebar Styles */
     .vscode-sidebar {
         width: 220px;
+        height: 100%;
         background: #181818;
         border-right: 1px solid #2d2d2d;
         display: flex;
@@ -151,6 +153,7 @@
     /* VS Code Activity Bar (icon strip) */
     .vscode-activity-bar {
         width: 48px;
+        height: 100%;
         background: #181818;
         border-right: 1px solid #2d2d2d;
         display: flex;
@@ -266,11 +269,12 @@
     /* VS Code Main Editor Area Styles */
     .vscode-main {
         flex: 1;
+        height: 100%;
         display: flex;
         flex-direction: column;
         overflow: hidden;
         background: #1e1e1e;
-        min-width: 0; /* Critical: prevents Monaco from overflowing */
+        min-width: 0;
     }
 
     .vscode-tabs,
