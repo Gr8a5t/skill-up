@@ -12,13 +12,17 @@ class ProfileController extends Controller
 {
     public function show(User $user)
     {
-        return view('fitlife.profile', compact('user'));
+        return \Inertia\Inertia::render('Profile/Show', [
+            'user' => $user,
+        ]);
     }
 
     public function edit()
     {
         $user = auth()->user();
-        return view('fitlife.profile-edit', compact('user'));
+        return \Inertia\Inertia::render('Profile/Edit', [
+            'user' => $user,
+        ]);
     }
 
     public function update(Request $request)

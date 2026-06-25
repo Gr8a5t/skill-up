@@ -11,6 +11,7 @@
     "require": {
         "php": "^8.3",
         "cloudinary/cloudinary_php": "*",
+        "inertiajs/inertia-laravel": "*",
         "intervention/image": "*",
         "laravel/framework": "^13.0",
         "laravel/tinker": "^3.0",

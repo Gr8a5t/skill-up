@@ -45,12 +45,12 @@ class FitlifeController extends Controller
             ],
         ];
 
-        return view('fitlife.home', compact('classes', 'blogs'));
+        return \Inertia\Inertia::render('Home', compact('classes', 'blogs'));
     }
 
     public function about()
     {
-        return view('fitlife.about');
+        return \Inertia\Inertia::render('About');
     }
 
     public function getWebDevCourses()
@@ -161,7 +161,7 @@ class FitlifeController extends Controller
         }
 
         $courses = $allCourses;
-        return view('fitlife.courses', compact('courses'));
+        return \Inertia\Inertia::render('Courses', compact('courses'));
     }
 
     public function courseLearn(string $slug)
@@ -309,7 +309,45 @@ class FitlifeController extends Controller
             $activeVideoId = $fallbackId;
         }
 
-        return view('fitlife.course-learn', compact('course', 'lessons', 'slug'));
+        $comments = \App\Models\CourseComment::where('course_slug', $slug)
+            ->whereNull('parent_id')
+            ->with(['replies' => function($q) {
+                $q->orderBy('created_at', 'asc');
+            }])
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function($comment) {
+                $likedBy = is_array($comment->liked_by) ? $comment->liked_by : json_decode($comment->liked_by ?? '[]', true);
+                $identifier = auth()->check() ? auth()->id() : session()->getId();
+                
+                $replies = $comment->replies->map(function($reply) use ($identifier) {
+                    $replyLikedBy = is_array($reply->liked_by) ? $reply->liked_by : json_decode($reply->liked_by ?? '[]', true);
+                    return [
+                        'id' => $reply->id,
+                        'user_id' => $reply->user_id,
+                        'user_name' => $reply->user_name,
+                        'avatar' => $reply->avatar,
+                        'content' => $reply->content,
+                        'created_at' => $reply->created_at->toIso8601String(),
+                        'likes' => $reply->likes,
+                        'is_liked' => in_array($identifier, $replyLikedBy),
+                    ];
+                });
+
+                return [
+                    'id' => $comment->id,
+                    'user_id' => $comment->user_id,
+                    'user_name' => $comment->user_name,
+                    'avatar' => $comment->avatar,
+                    'content' => $comment->content,
+                    'created_at' => $comment->created_at->toIso8601String(),
+                    'likes' => $comment->likes,
+                    'is_liked' => in_array($identifier, $likedBy),
+                    'replies' => $replies,
+                ];
+            });
+
+        return \Inertia\Inertia::render('CourseLearn', compact('course', 'lessons', 'slug', 'comments'));
     }
 
     public function updateCourseProgress(Request $request)
@@ -364,22 +402,14 @@ class FitlifeController extends Controller
             'coursera_link' => '#',
         ];
 
-        // Legacy compatibility for views that expect these variables
-        $content = [];
         $learningPoints = $dbCourse?->key_concepts ?? ['Core fundamentals', 'Best practices', 'Hands-on projects'];
-        $introLessons = [];
 
-        return view('fitlife.course-detail', compact('course', 'content', 'learningPoints', 'introLessons'));
+        return \Inertia\Inertia::render('CourseDetail', compact('course', 'learningPoints'));
     }
 
     public function paths()
     {
-        // The paths feature is currently under development.
-        // It returns a coming soon page without querying the database.
-        return view('fitlife.paths', [
-            'noTopbar' => true,
-            'noSidebar' => true
-        ]);
+        return \Inertia\Inertia::render('Paths');
     }
 
     public function learn(string $slug)
@@ -403,7 +433,7 @@ class FitlifeController extends Controller
             ->pluck('module_index')
             ->toArray();
 
-        return view('fitlife.path-learn', compact('path', 'completedModules'));
+        return redirect()->route('paths');
     }
 
     public function updateProgress(Request $request)
@@ -571,20 +601,465 @@ class FitlifeController extends Controller
         ];
     }
 
-
-
     public function dashboard()
     {
-        return view('fitlife.user-dashboard');
+        return \Inertia\Inertia::render('Dashboard', $this->getDashboardData());
     }
 
-    public function chats()
+    public function getDashboardData()
     {
-        return view('fitlife.chats');
+        $userId = auth()->id();
+        $sessionId = session()->getId();
+        $allCourses = $this->getWebDevCourses();
+
+        $queryRef = function ($q) use ($userId, $sessionId) {
+            if ($userId) $q->where('user_id', $userId);
+            else         $q->where('session_id', $sessionId);
+        };
+
+        $progressedSlugs = \App\Models\UserLessonProgress::where($queryRef)
+            ->select('course_slug')
+            ->distinct()
+            ->pluck('course_slug')
+            ->toArray();
+
+        $recentProgress = \App\Models\UserLessonProgress::where($queryRef)
+            ->orderByDesc('updated_at')
+            ->take(5)
+            ->get();
+
+        $lessons = $recentProgress->map(function ($rec) use ($allCourses) {
+            $courseData = collect($allCourses)->firstWhere('slug', $rec->course_slug);
+            $pct = $rec->total_seconds > 0
+                ? min(100, round(($rec->progress_seconds / $rec->total_seconds) * 100))
+                : 0;
+            return [
+                'course_slug' => $rec->course_slug,
+                'video_id'    => $rec->video_id,
+                'category'    => $courseData['category'] ?? 'Course',
+                'title'       => $courseData['title'] ?? $rec->course_slug,
+                'progress'    => $pct,
+                'updated'     => $rec->updated_at ? $rec->updated_at->toIso8601String() : null,
+            ];
+        })->toArray();
+
+        $totalVideosStarted = \App\Models\UserLessonProgress::where($queryRef)->count();
+        $completedVideos = \App\Models\UserLessonProgress::where($queryRef)->where('is_completed', true)->count();
+        $overallPct = $totalVideosStarted > 0 ? round(($completedVideos / $totalVideosStarted) * 100) : 0;
+
+        $stats = [
+            'courses_started'  => count($progressedSlugs),
+            'videos_completed' => $completedVideos,
+            'overall_pct'      => $overallPct,
+        ];
+
+        $activityRaw = \App\Models\UserLessonProgress::where($queryRef)
+            ->where('updated_at', '>=', now()->subDays(365))
+            ->selectRaw('DATE(updated_at) as day, COUNT(*) as count')
+            ->groupBy('day')
+            ->pluck('count', 'day')
+            ->toArray();
+
+        $activityMap = [];
+        for ($i = 364; $i >= 0; $i--) {
+            $date = now()->subDays($i)->format('Y-m-d');
+            $activityMap[$date] = $activityRaw[$date] ?? 0;
+        }
+
+        $continueWatching = collect($allCourses)->take(6)->map(fn($c) => [
+            'slug'     => $c['slug'],
+            'title'    => $c['title'],
+            'category' => $c['category'],
+            'icon'     => $c['icon'],
+            'color'    => $c['color'],
+        ])->values()->toArray();
+
+        $mentors = [
+            ['name' => 'Padhang Satrio',   'role' => 'Mentor', 'avatar' => 'PS'],
+            ['name' => 'Zakir Horizontal', 'role' => 'Mentor', 'avatar' => 'ZH'],
+            ['name' => 'Leonardo samsul',  'role' => 'Mentor', 'avatar' => 'LS'],
+        ];
+
+        return [
+            'stats' => $stats,
+            'lessons' => $lessons,
+            'activityMap' => $activityMap,
+            'continueWatching' => $continueWatching,
+            'mentors' => $mentors,
+        ];
+    }
+
+    public function chats(Request $request)
+    {
+        return \Inertia\Inertia::render('Chats', $this->getChatsData($request));
+    }
+
+    public function getChatsData(Request $request)
+    {
+        $userId = auth()->id();
+        $recipientIdHash = $request->query('user_id');
+
+        if (!$recipientIdHash) {
+            $latestMessage = \App\Models\ChatMessage::where('sender_id', $userId)
+                ->orWhere('recipient_id', $userId)
+                ->orderBy('created_at', 'desc')
+                ->first();
+
+            if ($latestMessage) {
+                $recId = $latestMessage->sender_id === $userId 
+                    ? $latestMessage->recipient_id 
+                    : $latestMessage->sender_id;
+                $recipientIdHash = \App\Utils\HashId::encode($recId);
+            }
+        }
+
+        $latestMessages = \App\Models\ChatMessage::whereIn('id', function ($query) use ($userId) {
+            $query->select(\Illuminate\Support\Facades\DB::raw('MAX(id)'))
+                ->from('chat_messages')
+                ->where('sender_id', $userId)
+                ->orWhere('recipient_id', $userId)
+                ->groupBy(\Illuminate\Support\Facades\DB::raw('CASE WHEN sender_id = ' . $userId . ' THEN recipient_id ELSE sender_id END'));
+        })
+        ->select('id', \Illuminate\Support\Facades\DB::raw('CASE WHEN sender_id = ' . $userId . ' THEN recipient_id ELSE sender_id END as contact_id'), 'created_at', 'message', 'is_read', 'sender_id')
+        ->orderBy('created_at', 'desc')
+        ->get();
+
+        $conversations = [];
+        foreach ($latestMessages as $msg) {
+            $user = \App\Models\User::find($msg->contact_id);
+            if (!$user) continue;
+
+            $unreadCount = \App\Models\ChatMessage::where('sender_id', $user->id)
+                ->where('recipient_id', $userId)
+                ->where('is_read', false)
+                ->count();
+
+            $conversations[] = [
+                'id' => \App\Utils\HashId::encode($user->id),
+                'name' => $user->name,
+                'avatar' => $user->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($user->name) . '&background=f0ebff&color=8e54e9',
+                'message' => $msg->message,
+                'time' => $msg->created_at->diffForHumans(null, true),
+                'unread' => $unreadCount > 0,
+                'unread_count' => $unreadCount,
+                'is_online' => $user->isOnline(),
+            ];
+        }
+
+        $messages = collect();
+        $activeRecipient = null;
+
+        if ($recipientIdHash) {
+            $decoded = \App\Utils\HashId::decode($recipientIdHash);
+            if (!empty($decoded)) {
+                $recipientId = $decoded[0];
+                $activeRecipient = \App\Models\User::find($recipientId);
+
+                if ($activeRecipient) {
+                    \App\Models\ChatMessage::where('sender_id', $recipientId)
+                        ->where('recipient_id', $userId)
+                        ->where('is_read', false)
+                        ->update(['is_read' => true]);
+
+                    $messages = \App\Models\ChatMessage::where(function ($q) use ($recipientId, $userId) {
+                            $q->where('sender_id', $userId)->where('recipient_id', $recipientId);
+                        })->orWhere(function ($q) use ($recipientId, $userId) {
+                            $q->where('sender_id', $recipientId)->where('recipient_id', $userId);
+                        })
+                        ->orderBy('created_at', 'asc')
+                        ->get()
+                        ->map(function($msg) {
+                            return [
+                                'id' => $msg->id,
+                                'sender_id' => $msg->sender_id,
+                                'recipient_id' => $msg->recipient_id,
+                                'message' => $msg->message,
+                                'created_at' => $msg->created_at->toIso8601String(),
+                            ];
+                        });
+                }
+            }
+        }
+
+        return [
+            'conversations' => $conversations,
+            'messages' => $messages,
+            'activeRecipient' => $activeRecipient ? [
+                'id' => $activeRecipient->id,
+                'name' => $activeRecipient->name,
+                'avatar' => $activeRecipient->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($activeRecipient->name) . '&background=f0ebff&color=8e54e9',
+                'is_online' => $activeRecipient->isOnline(),
+            ] : null,
+        ];
+    }
+
+    public function sendMessage(Request $request)
+    {
+        $userId = auth()->id();
+        $recipientId = $request->input('recipient_id');
+        $text = $request->input('message');
+
+        if (!$recipientId || !$text) {
+            return back()->withErrors(['message' => 'Invalid parameters']);
+        }
+
+        \App\Models\ChatMessage::create([
+            'sender_id' => $userId,
+            'recipient_id' => $recipientId,
+            'message' => $text,
+        ]);
+
+        return back();
+    }
+
+    public function updateMessage(Request $request)
+    {
+        $userId = auth()->id();
+        $messageId = $request->input('message_id');
+        $text = $request->input('message');
+
+        $message = \App\Models\ChatMessage::findOrFail($messageId);
+        if ($message->sender_id !== $userId) {
+            abort(403);
+        }
+
+        if ($message->created_at->diffInMinutes() >= 5) {
+            return back()->withErrors(['message' => 'Time limit for editing (5m) has passed.']);
+        }
+
+        $message->update([
+            'message' => $text,
+        ]);
+
+        return back();
+    }
+
+    public function deleteMessage($id)
+    {
+        $userId = auth()->id();
+        $message = \App\Models\ChatMessage::findOrFail($id);
+        
+        if ($message->sender_id !== $userId) {
+            abort(403);
+        }
+
+        $message->delete();
+
+        return back();
     }
 
     public function forum()
     {
-        return view('fitlife.forum');
+        $posts = \App\Models\ForumPost::with('user')->latest()->get()->map(function($post) {
+            return [
+                'id' => $post->id,
+                'body' => $post->body,
+                'tags' => $post->tags ?? ['General'],
+                'created_at' => $post->created_at->toIso8601String(),
+                'likes_count' => $post->likes_count ?? 0,
+                'comments_count' => $post->comments_count ?? 0,
+                'user' => [
+                    'id' => $post->user->id,
+                    'name' => $post->user->name,
+                    'avatar' => $post->user->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($post->user->name) . '&background=ffe4ef&color=ff4aa0',
+                ]
+            ];
+        });
+
+        return \Inertia\Inertia::render('Forum', [
+            'posts' => $posts,
+        ]);
+    }
+
+    public function createForumPost(Request $request)
+    {
+        $request->validate([
+            'body' => 'required|min:3|max:2000',
+        ]);
+
+        $activeTab = $request->input('tab', 'For you');
+
+        \App\Models\ForumPost::create([
+            'user_id' => auth()->id(),
+            'body' => $request->input('body'),
+            'tags' => [$activeTab === 'For you' ? 'General' : $activeTab],
+        ]);
+
+        return back()->with('success', 'Post created successfully!');
+    }
+
+    public function submitComment(Request $request, $slug)
+    {
+        $request->validate([
+            'content' => 'required|string|max:1000',
+        ]);
+
+        \App\Models\CourseComment::create([
+            'course_slug' => $slug,
+            'user_id' => auth()->check() ? auth()->id() : null,
+            'user_name' => auth()->check() ? auth()->user()->name : 'Guest Student',
+            'avatar' => auth()->check() 
+                ? (auth()->user()->avatar ?? 'https://ui-avatars.com/api/?name='.urlencode(auth()->user()->name))
+                : 'https://i.pravatar.cc/150?u=' . session()->getId(),
+            'content' => $request->input('content'),
+        ]);
+
+        return back();
+    }
+
+    public function submitCommentReply(Request $request, $slug, $commentId)
+    {
+        $request->validate([
+            'content' => 'required|string|max:1000',
+        ]);
+
+        \App\Models\CourseComment::create([
+            'course_slug' => $slug,
+            'parent_id' => $commentId,
+            'user_id' => auth()->check() ? auth()->id() : null,
+            'user_name' => auth()->check() ? auth()->user()->name : 'Guest Student',
+            'avatar' => auth()->check() 
+                ? (auth()->user()->avatar ?? 'https://ui-avatars.com/api/?name='.urlencode(auth()->user()->name))
+                : 'https://i.pravatar.cc/150?u=' . session()->getId(),
+            'content' => $request->input('content'),
+        ]);
+
+        return back();
+    }
+
+    public function likeComment(Request $request, $slug, $commentId)
+    {
+        $comment = \App\Models\CourseComment::findOrFail($commentId);
+        $identifier = auth()->check() ? auth()->id() : session()->getId();
+        $likedBy = is_array($comment->liked_by) ? $comment->liked_by : json_decode($comment->liked_by ?? '[]', true);
+        
+        if (!in_array($identifier, $likedBy)) {
+            $likedBy[] = $identifier;
+            $comment->liked_by = $likedBy;
+            $comment->likes++;
+        } else {
+            $likedBy = array_diff($likedBy, [$identifier]);
+            $comment->liked_by = array_values($likedBy);
+            $comment->likes = max(0, $comment->likes - 1);
+        }
+        $comment->save();
+
+        return back();
+    }
+
+    public function updateComment(Request $request, $slug, $commentId)
+    {
+        $comment = \App\Models\CourseComment::findOrFail($commentId);
+        if ($comment->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        if ($comment->created_at->diffInMinutes() >= 5) {
+            return back()->withErrors(['comment' => 'Time limit for editing (5m) has passed.']);
+        }
+
+        $request->validate([
+            'content' => 'required|string|max:1000',
+        ]);
+
+        $comment->update([
+            'content' => $request->input('content'),
+        ]);
+
+        return back();
+    }
+
+    public function deleteComment($slug, $commentId)
+    {
+        $comment = \App\Models\CourseComment::findOrFail($commentId);
+        if ($comment->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        // Delete replies too
+        $comment->replies()->delete();
+        $comment->delete();
+
+        return back();
+    }
+
+    public function courseAiChat(Request $request, $slug)
+    {
+        $request->validate([
+            'messages' => 'required|array',
+        ]);
+
+        $course = collect($this->getWebDevCourses())->firstWhere('slug', $slug);
+        if (!$course) abort(404);
+
+        $title = $course['title'] ?? 'Course';
+        $recap = $course['recap'] ?? '';
+        $concepts = implode(', ', $course['concepts'] ?? []);
+
+        $courseContext = "You are an AI learning assistant exclusively for the course titled '{$title}'. " .
+                         "Course Summary: {$recap}. Key Concepts covered: {$concepts}. " .
+                         "Your only job is to answer questions related to this specific course and its concepts. " .
+                         "If a user asks a question entirely unrelated to the course topic, politely decline to answer, " .
+                         "stating that you are here specifically to help with '{$title}'. " .
+                         "IMPORTANT: If you provide any websites or URLs, you MUST format them as valid clickable markdown links (e.g., [Website Name](https://example.com)). " .
+                         "Keep your answers concise, helpful, and educational.";
+
+        $apiKey = config('services.gemini.key');
+        if (empty($apiKey)) {
+            return response()->json([
+                'role' => 'assistant',
+                'content' => "Error: Gemini API key is not configured in .env (GEMINI_API_KEY)."
+            ]);
+        }
+
+        $contents = [];
+        foreach ($request->input('messages') as $msg) {
+            $role = $msg['role'] === 'user' ? 'user' : 'model';
+            $contents[] = [
+                'role' => $role,
+                'parts' => [
+                    ['text' => $msg['content']]
+                ]
+            ];
+        }
+
+        $payload = [
+            'system_instruction' => [
+                'parts' => [
+                    ['text' => $courseContext]
+                ]
+            ],
+            'contents' => $contents,
+        ];
+
+        try {
+            $response = Http::timeout(15)->withHeaders([
+                'Content-Type' => 'application/json',
+            ])->post("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={$apiKey}", $payload);
+
+            if ($response->successful()) {
+                $data = $response->json();
+                if (isset($data['candidates'][0]['content']['parts'][0]['text'])) {
+                    $aiText = $data['candidates'][0]['content']['parts'][0]['text'];
+                    return response()->json([
+                        'role' => 'assistant',
+                        'content' => $aiText
+                    ]);
+                }
+            }
+            return response()->json([
+                'role' => 'assistant',
+                'content' => "Sorry, I received an unexpected response format from the AI server."
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'role' => 'assistant',
+                'content' => "Sorry, an error occurred while processing your request."
+            ]);
+        }
     }
 }
+
+
+
+

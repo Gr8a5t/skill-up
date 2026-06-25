@@ -18,6 +18,18 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
+    protected $appends = ['route_key'];
+
+    public function getRouteKeyAttribute()
+    {
+        return $this->getRouteKey();
+    }
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
