@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import DashboardLayout from '../Layouts/DashboardLayout';
 
 interface Lesson {
@@ -38,6 +38,9 @@ interface DashboardProps {
 }
 
 export default function Dashboard({ stats, lessons, activityMap, continueWatching, mentors }: DashboardProps) {
+    const { props: pageProps } = usePage();
+    const auth = (pageProps as any).auth;
+    const currentUser = auth?.user;
     const carouselRef = useRef<HTMLDivElement>(null);
     const [canScrollPrev, setCanScrollPrev] = useState(false);
     const [canScrollNext, setCanScrollNext] = useState(true);
@@ -420,11 +423,19 @@ export default function Dashboard({ stats, lessons, activityMap, continueWatchin
                             }}
                         >
                             <div className="stat-inner">
-                                <img 
-                                    src={`https://ui-avatars.com/api/?name=${encodeURIComponent('User')}&background=f0ebff&color=8e54e9&rounded=true&size=100`} 
-                                    alt="Avatar" 
-                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
-                                />
+                                {currentUser?.avatar ? (
+                                    <img 
+                                        src={currentUser.avatar} 
+                                        alt={currentUser.name} 
+                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                                    />
+                                ) : (
+                                    <img 
+                                        src={`https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser?.name || 'User')}&background=f0ebff&color=8e54e9&rounded=true&size=100`} 
+                                        alt="Avatar" 
+                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                                    />
+                                )}
                             </div>
                             <div className="stat-val">{stats.overall_pct}%</div>
                         </div>
