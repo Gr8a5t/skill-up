@@ -90,17 +90,26 @@ skill-up/
 
 SkillUp uses a relational SQLite database with the following core entities and relationships:
 
-```mermaid
-erDiagram
-    User ||--o{ UserLessonProgress : tracks
-    User ||--o{ ChatMessage : sends_receives
-    User ||--o{ CourseComment : comments
-    User ||--o{ ForumPost : creates
-    User }o--o{ User : follows
-    Course ||--|{ Lesson : contains
-    Lesson ||--o{ UserLessonProgress : logs
-    Course ||--o{ CourseComment : discusses
-    ForumPost ||--o{ ForumComment : receives
+```text
+  +-------------------+        +------------------------+
+  |       User        |-------o|   UserLessonProgress   |
+  +-------------------+        +------------------------+
+  | - route_key (hash)|                    |
+  | - name, email     |                    | (belongs to)
+  +-------------------+                    v
+     |   |   |   |             +------------------------+
+     |   |   |   +------------o|         Lesson         |
+     |   |   |                 +------------------------+
+     |   |   |                             | (belongs to)
+     |   |   |                             v
+     |   |   |                 +------------------------+
+     |   |   +-----------------o|         Course         |
+     |   |                     +------------------------+
+     |   |                                 |
+     |   |                                 v
+     |   +----------------------------> [ CourseComment ]
+     |
+     +--------------------------------> [ ChatMessage / ForumPost ]
 ```
 
 ### Database Entities & Eloquent Models
