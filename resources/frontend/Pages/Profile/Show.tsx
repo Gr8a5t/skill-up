@@ -109,10 +109,10 @@ export default function Show({ user, auth }: ProfileShowProps) {
                                         <div style={{ fontWeight: 600, fontSize: '1.4rem', padding: '12px 24px', border: '1px solid #eaeaea', borderRadius: '30px', color: '#1c1c1c', background: '#fff' }}>
                                             0 Followers
                                         </div>
-                                        <button style={{ width: '48px', height: '48px', borderRadius: '50%', border: '1px solid #eaeaea', background: 'transparent', display: 'flex', alignItems: 'center', justify: 'center', cursor: 'pointer', color: '#444', fontSize: '1.8rem' }}>
+                                        <button style={{ width: '48px', height: '48px', borderRadius: '50%', border: '1px solid #eaeaea', background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#444', fontSize: '1.8rem' }}>
                                             <ion-icon name="stats-chart-outline"></ion-icon>
                                         </button>
-                                        <button style={{ width: '48px', height: '48px', borderRadius: '50%', border: '1px solid #eaeaea', background: 'transparent', display: 'flex', alignItems: 'center', justify: 'center', cursor: 'pointer', color: '#444', fontSize: '1.8rem' }}>
+                                        <button style={{ width: '48px', height: '48px', borderRadius: '50%', border: '1px solid #eaeaea', background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#444', fontSize: '1.8rem' }}>
                                             <ion-icon name="share-outline"></ion-icon>
                                         </button>
                                     </>
@@ -132,7 +132,7 @@ export default function Show({ user, auth }: ProfileShowProps) {
                         {/* Right Media Box */}
                         <div 
                             onClick={() => setWorkModalOpen(true)}
-                            style={{ border: '1px solid #eaeaea', borderRadius: '16px', padding: '40px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyCenter: 'center', textAlign: 'center', height: '100%', minHeight: '250px', background: '#fdfdfd', cursor: 'pointer', transition: '0.2s' }}
+                            style={{ border: '1px solid #eaeaea', borderRadius: '16px', padding: '40px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', height: '100%', minHeight: '250px', background: '#fdfdfd', cursor: 'pointer', transition: '0.2s' }}
                         >
                             <ion-icon name="image-outline" style={{ fontSize: '3rem', color: '#888', marginBottom: '15px' }}></ion-icon>
                             <h3 style={{ fontSize: '1.6rem', color: '#333', fontWeight: 600, marginBottom: '8px' }}>Add featured media</h3>
@@ -246,7 +246,7 @@ export default function Show({ user, auth }: ProfileShowProps) {
                                         </div>
                                     )}
 
-                                    <div style={{ display: 'flex', alignItems: 'center', justify: 'space-between', marginBottom: '15px' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '15px' }}>
                                         <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: '#888', textTransform: 'uppercase', letterSpacing: '1px' }}>Social Links</h3>
                                         {isOwnProfile && (user.github_url || user.linkedin_url) && (
                                             <Link href="/profile/edit" style={{ color: '#888', fontSize: '1.5rem' }}><ion-icon name="create-outline"></ion-icon></Link>

@@ -492,10 +492,10 @@ export default function Dashboard({ stats, lessons, activityMap, continueWatchin
                             <div className="heatmap-legend">
                                 Less
                                 <span className="legend-cell" style={{ background: '#ede9f7' }}></span>
-                                <span class="legend-cell" style={{ background: '#c4b0f5' }}></span>
-                                <span class="legend-cell" style={{ background: '#9b77ee' }}></span>
-                                <span class="legend-cell" style={{ background: '#7340e0' }}></span>
-                                <span class="legend-cell" style={{ background: '#4a00c8' }}></span>
+                                <span className="legend-cell" style={{ background: '#c4b0f5' }}></span>
+                                <span className="legend-cell" style={{ background: '#9b77ee' }}></span>
+                                <span className="legend-cell" style={{ background: '#7340e0' }}></span>
+                                <span className="legend-cell" style={{ background: '#4a00c8' }}></span>
                                 More
                             </div>
                         </div>

@@ -807,7 +807,7 @@ export default function CourseLearn({ course, lessons, slug, comments, auth }: C
                             required
                             disabled={aiSending}
                         />
-                        <button type="submit" disabled={aiSending} style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--brand-primary)', color: '#fff', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyCenter: 'center', fontSize: '1.8rem' }}>
+                        <button type="submit" disabled={aiSending} style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--brand-primary)', color: '#fff', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.8rem' }}>
                             <ion-icon name="send"></ion-icon>
                         </button>
                     </form>

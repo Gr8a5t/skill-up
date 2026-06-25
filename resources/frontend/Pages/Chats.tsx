@@ -65,8 +65,7 @@ export default function Chats({ conversations, messages, activeRecipient, auth }
     useEffect(() => {
         const interval = setInterval(() => {
             router.reload({ 
-                only: ['messages', 'conversations'], 
-                preserveScroll: true 
+                only: ['messages', 'conversations']
             });
         }, 4000);
         return () => clearInterval(interval);

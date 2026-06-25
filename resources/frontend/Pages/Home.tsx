@@ -57,7 +57,7 @@ export default function Home({ classes, blogs }: HomeProps) {
                             </div>
 
                             <div className="hero-banner">
-                                <img src="/fitlife-assets/images/hero-banner.png" width="660" height="753" alt="hero banner" className="w-100" fetchpriority="high" decoding="async" />
+                                <img src="/fitlife-assets/images/hero-banner.png" width="660" height="753" alt="hero banner" className="w-100" fetchPriority="high" decoding="async" />
                                 <img src="/fitlife-assets/images/hero-circle-one.png" width="666" height="666" aria-hidden="true" alt="" className="circle circle-1" />
                                 <img src="/fitlife-assets/images/hero-circle-two.png" width="666" height="666" aria-hidden="true" alt="" className="circle circle-2" />
                             </div>

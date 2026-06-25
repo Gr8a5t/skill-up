@@ -203,7 +203,7 @@ export default function DashboardLayout({ children, title, noSidebar = false, no
                 {/* Sidebar */}
                 {!noSidebar && (
                     <aside className={`sidebar ${isSidebarCollapsed ? 'collapsed' : ''} ${isMobileSidebarOpen ? 'open' : ''}`} id="dashboardSidebar">
-                        <div style={{ display: 'flex', alignItems: 'center', justifySpace: 'space-between', padding: '24px var(--padding-side) 20px', justifyContent: 'space-between' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '24px var(--padding-side) 20px' }}>
                             <Link href="/" className="sidebar-logo" style={{ padding: 0, margin: 0 }}>
                                 <img src="/fitlife-assets/images/uplogo.png" alt="SkillUp Logo" className="sidebar-logo-img" style={{ width: '120px', height: 'auto' }} />
                             </Link>
