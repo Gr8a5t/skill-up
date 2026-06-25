@@ -40,25 +40,35 @@ class ProfileController extends Controller
 
         $data = $validated;
 
-        // Handle Avatar File Upload with Resizing
+        // Handle Avatar File Upload
         if ($request->hasFile('avatar_file')) {
             $file = $request->file('avatar_file');
 
-            if (extension_loaded('gd') || extension_loaded('imagick')) {
-                $filename = time() . '.webp';
-                $path = 'avatars/' . $filename;
+            $cloudinaryConfig = config('services.cloudinary');
+            $hasCloudinary = !empty($cloudinaryConfig['url']) || 
+                (!empty($cloudinaryConfig['cloud_name']) && 
+                 !empty($cloudinaryConfig['api_key']) && 
+                 !empty($cloudinaryConfig['api_secret']));
 
-                $manager = new ImageManager(new Driver());
-                $image = $manager->decode($file);
-                $image->cover(500, 500);
-                $encoded = $image->encodeUsingFileExtension('webp', 80);
-                
-                Storage::disk('public')->put($path, (string) $encoded);
-                $data['avatar'] = '/storage/' . $path;
+            if ($hasCloudinary) {
+                try {
+                    $cloudinary = app(\App\Services\CloudinaryService::class);
+                    $data['avatar'] = $cloudinary->upload($file->getRealPath(), 'avatars', [
+                        'transformation' => [
+                            'width' => 500,
+                            'height' => 500,
+                            'crop' => 'fill',
+                            'gravity' => 'face',
+                            'quality' => 'auto',
+                            'fetch_format' => 'auto'
+                        ]
+                    ]);
+                } catch (\Exception $e) {
+                    logger()->error('Cloudinary upload failed, falling back to local storage: ' . $e->getMessage());
+                    $data['avatar'] = $this->storeLocal($file);
+                }
             } else {
-                // Fallback: simply store the uploaded file if image driver is missing
-                $path = $file->store('avatars', 'public');
-                $data['avatar'] = '/storage/' . $path;
+                $data['avatar'] = $this->storeLocal($file);
             }
         } elseif ($request->filled('avatar_url')) {
             $data['avatar'] = $request->avatar_url;
@@ -70,5 +80,31 @@ class ProfileController extends Controller
         $user->update($data);
 
         return redirect()->route('profile.show', $user)->with('success', 'Profile updated successfully!');
+    }
+
+    /**
+     * Store the uploaded file locally.
+     *
+     * @param \Illuminate\Http\UploadedFile $file
+     * @return string
+     */
+    protected function storeLocal($file): string
+    {
+        if (extension_loaded('gd') || extension_loaded('imagick')) {
+            $filename = time() . '.webp';
+            $path = 'avatars/' . $filename;
+
+            $manager = new ImageManager(new Driver());
+            $image = $manager->decode($file);
+            $image->cover(500, 500);
+            $encoded = $image->encodeUsingFileExtension('webp', 80);
+            
+            Storage::disk('public')->put($path, (string) $encoded);
+            return '/storage/' . $path;
+        }
+
+        // Fallback: simply store the uploaded file if image driver is missing
+        $path = $file->store('avatars', 'public');
+        return '/storage/' . $path;
     }
 }
