@@ -18,7 +18,7 @@
     @includeIf('partials.google-tag')
 
     @viteReactRefresh
-    @vite(['resources/js/app.tsx', 'resources/css/app.css'])
+    @vite(['resources/frontend/app.tsx', 'resources/css/app.css'])
     @inertiaHead
 </head>
 <body id="top">

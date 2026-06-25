@@ -17,10 +17,10 @@ This guide will help you understand the directory structure and how to add pages
 
 ## 📁 Directory Structure
 
-All frontend code lives under `resources/js/`:
+All frontend code lives under `resources/frontend/`:
 
 ```
-resources/js/
+resources/frontend/
 ├── Components/         # Reusable frontend UI components (Header, Footer, etc.)
 │   ├── Header.tsx
 │   └── Footer.tsx
@@ -42,7 +42,7 @@ resources/js/
 To add a new page (e.g. "Courses"), follow these three simple steps:
 
 ### Step 1: Create the React Component
-Create a new file in `resources/js/Pages/Courses.tsx`. 
+Create a new file in `resources/frontend/Pages/Courses.tsx`. 
 
 ```tsx
 import React from 'react';
@@ -76,7 +76,7 @@ export default function Courses({ courses }: CoursesProps) {
 ```
 
 ### Step 2: Define the Route in Laravel Controller
-In your Laravel controller (e.g. `FitlifeController.php`), import the `Inertia` class and return the component. Inertia will look directly in `resources/js/Pages/` for a file named `Courses.tsx`.
+In your Laravel controller (e.g. `FitlifeController.php`), import the `Inertia` class and return the component. Inertia will look directly in `resources/frontend/Pages/` for a file named `Courses.tsx`.
 
 ```php
 use Inertia\Inertia;
@@ -88,7 +88,7 @@ public function courses()
         ['id' => 2, 'title' => 'CSS Styling'],
     ];
 
-    // Renders resources/js/Pages/Courses.tsx
+    // Renders resources/frontend/Pages/Courses.tsx
     return Inertia::render('Courses', [
         'courses' => $courses
     ]);

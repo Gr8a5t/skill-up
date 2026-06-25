@@ -24,8 +24,8 @@
     /* Paths */
     "baseUrl": ".",
     "paths": {
-      "@/*": ["resources/js/*"]
+      "@/*": ["resources/frontend/*"]
     }
   },
-  "include": ["resources/js/**/*.ts", "resources/js/**/*.tsx", "resources/js/**/*.d.ts"]
+  "include": ["resources/frontend/**/*.ts", "resources/frontend/**/*.tsx", "resources/frontend/**/*.d.ts"]
 }
